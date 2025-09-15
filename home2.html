@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Home page</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://apis.google.com/js/client.js?onload=initClient"></script>
+    <script >
+
+$(document).ready(function() {
+      var light = [0,6,8,13,14,14,12,13,16,14];
+      var lighting = [];
+      var tchk=[];
+
+
+    setInterval(exefunc, 1000);
+    function exefunc(){
+          fetchhome_2_lightData();
+          fetchteacherData();
+        showteacher();
+      }
+
+      async function fetchteacherData() {
+            try {
+                const response = await fetch('http://192.168.0.109:5000/get_teacher_data');
+                
+                if (!response.ok) {
+                    throw new Error('HTTP 错误! 状态码: ' + response.status);
+                }
+        
+                const data = await response.json();
+                console.log(data);
+                var count = 0;
+                data.forEach(item => {
+                if(item.value !== null) {
+                  tchk[count]=item.value;
+                  count++;}
+            })       
+
+            } catch (error) {
+                console.error('获取数据时发生错误:', error);
+            }
+        }
+
+    async function fetchhome_2_lightData() {
+        try {
+            const response = await fetch('http://192.168.0.109:5000/get_home_2_light_data');
+            
+            if (!response.ok) {
+                throw new Error('HTTP 错误! 状态码: ' + response.status);
+            }
+    
+            const data = await response.json();
+            console.log(data);
+            var count2 = 0;
+            data.forEach(item => {
+            if(item.light !== null) {
+              lighting[count2]=item.light;
+              count2++;}
+        })
+            // 处理获取的数据
+            // 比如：将数据渲染到网页上
+            // renderClassroomData(data);
+    
+        } catch (error) {
+            console.error('wrong:', error);
+        }
+    }
+    function showteacher(){
+     
+     
+      if(lighting[0]==1&&tchk[16]==1){
+        $('#teacher1').css('background-color', 'rgba(110, 175, 218, 0.993)');
+      }else if(lighting[0]==0||tchk[16]==0){
+        $('#teacher1').css('background-color', 'rgba(0, 0, 0,0)');
+      }
+      if(lighting[1]==1&&tchk[17]==1){
+        $('#teacher2').css('background-color', 'rgba(110, 175, 218, 0.993)');
+      }else if(lighting[1]==0||tchk[17]==0){
+        $('#teacher2').css('background-color', 'rgba(0, 0, 0,0)');
+      }
+      if(lighting[2]==1&&tchk[18]==1){
+        $('#teacher3').css('background-color', 'rgba(110, 175, 218, 0.993)');
+      }else if(lighting[2]==0||tchk[18]==0){
+        $('#teacher3').css('background-color', 'rgba(0, 0, 0,0)');
+      }
+      if(lighting[3]==1&&tchk[19]==1){
+        $('#teacher4').css('background-color', 'rgba(110, 175, 218, 0.993)');
+      }else if(lighting[3]==0||tchk[19]==0){
+        $('#teacher4').css('background-color', 'rgba(0, 0, 0,0)');
+      }
+      if(lighting[4]==1&&tchk[20]==1){
+        $('#teacher5').css('background-color', 'rgba(110, 175, 218, 0.993)');
+      }else if(lighting[4]==0||tchk[20]==0){
+        $('#teacher5').css('background-color', 'rgba(0, 0, 0,0)');
+      }
+      if(lighting[5]==1&&tchk[21]==1){
+        $('#teacher6').css('background-color', 'rgba(110, 175, 218, 0.993)');
+      }else if(lighting[5]==0||tchk[21]==0){
+        $('#teacher6').css('background-color', 'rgba(0, 0, 0,0)');
+      }
+      if(lighting[6]==1&&tchk[22]==1){
+        $('#teacher7').css('background-color', 'rgba(110, 175, 218, 0.993)');
+      }else if(lighting[25]==0||tchk[22]==0){
+        $('#teacher7').css('background-color', 'rgba(0, 0, 0,0)');
+      }
+      if(lighting[7]==1&&tchk[23]==1){
+        $('#teacher8').css('background-color', 'rgba(110, 175, 218, 0.993)');
+      }else if(lighting[7]==0||tchk[52]==0){
+        $('#teacher8').css('background-color', 'rgba(0, 0, 0,0)');
+      }
+      if(lighting[8]==1&&tchk[24]==1){
+        $('#teacher9').css('background-color', 'rgba(110, 175, 218, 0.993)');
+      }else if(lighting[8]==0||tchk[24]==0){
+        $('#teacher9').css('background-color', 'rgba(0, 0, 0,0)');
+      }
+      if(lighting[9]==1&&tchk[25]==1){
+        $('#teacher10').css('background-color', 'rgba(110, 175, 218, 0.993)');
+      }else if(lighting[9]==0||tchk[25]==0){
+        $('#teacher10').css('background-color', 'rgba(0, 0, 0,0)');
+      }
+      if(lighting[10]==1&&tchk[26]==1){
+        $('#teacher11').css('background-color', 'rgba(110, 175, 218, 0.993)');
+      }else if(lighting[10]==0||tchk[26]==0){
+        $('#teache11').css('background-color', 'rgba(0, 0, 0,0)');
+      }
+      if(lighting[11]==1&&tchk[27]==1){
+        $('#teacher12').css('background-color', 'rgba(110, 175, 218, 0.993)');
+      }else if(lighting[11]==0||tchk[27]==0){
+        $('#teacher12').css('background-color', 'rgba(0, 0, 0,0)');
+      }
+      if(lighting[12]==1&&tchk[28]==1){
+        $('#teacher13').css('background-color', 'rgba(110, 175, 218, 0.993)');
+      }else if(lighting[12]==0||tchk[28]==0){
+        $('#teacher13').css('background-color', 'rgba(0, 0, 0,0)');
+      }
+      if(lighting[13]==1&&tchk[29]==1){
+        $('#teacher14').css('background-color', 'rgba(110, 175, 218, 0.993)');
+      }else if(lighting[13]==0||tchk[29]==0){
+        $('#teacher14').css('background-color', 'rgba(0, 0, 0,0)');
+      }
+      if(lighting[14]==1&&tchk[30]==1){
+        $('#teacher15').css('background-color', 'rgba(110, 175, 218, 0.993)');
+      }else if(lighting[14]==0||tchk[30]==0){
+        $('#teacher15').css('background-color', 'rgba(0, 0, 0,0)');
+      }
+      if(lighting[15]==1&&tchk[31]==1){
+        $('#teacher16').css('background-color', 'rgba(110, 175, 218, 0.993)');
+      }else if(lighting[15]==0||tchk[31]==0){
+        $('#teacher16').css('background-color', 'rgba(0, 0, 0,0)');
+      }
+      if(lighting[16]==1&&tchk[32]==1){
+        $('#teacher17').css('background-color', 'rgba(110, 175, 218, 0.993)');
+      }else if(lighting[16]==0||tchk[32]==0){
+        $('#teacher17').css('background-color', 'rgba(0, 0, 0,0)');
+      }
+      if(lighting[17]==1&&tchk[33]==1){
+        $('#teacher18').css('background-color', 'rgba(110, 175, 218, 0.993)');
+      }else if(lighting[17]==0||tchk[33]==0){
+        $('#teacher18').css('background-color', 'rgba(0, 0, 0,0)');
+      }
+      if(lighting[18]==1&&tchk[34]==1){
+        $('#teacher19').css('background-color', 'rgba(110, 175, 218, 0.993)');
+      }else if(lighting[18]==0||tchk[34]==0){
+        $('#teacher19').css('background-color', 'rgba(0, 0, 0,0)');
+      }
+      if(lighting[19]==1&&tchk[35]==1){
+        $('#teacher20').css('background-color', 'rgba(110, 175, 218, 0.993)');
+      }else if(lighting[19]==0||tchk[35]==0){
+        $('#teacher20').css('background-color', 'rgba(0, 0, 0,0)');
+      }
+
+
+    }
+})
+
+    </script>
+    <style>
+        .button1 {
+            position: absolute;
+            padding: 8px 16px;
+            border: none;
+            cursor: pointer;
+            margin-top: 5px;
+            left: 0;
+            /* border-radius: 50px; */
+            background-color: rgba(129, 188, 236, 0.568);
+        }
+        .button2 {
+          position: absolute;
+          padding: 8px 16px;
+          border: none;
+          cursor: pointer;
+          margin-top: 5px;
+          
+        }
+        .button3 {
+          position: absolute;
+          padding: 4px 4px;
+          border: none;
+          cursor: pointer;
+          margin-top: 5px;
+          
+        }
+        .button4 {
+          position: absolute;
+          background-color:transparent;
+          padding: 9.5px 9.5px;
+          cursor: pointer;
+          margin-top: 5px;
+          
+        }
+        #title {  
+            color: rgb(30, 69, 95);
+            font-size: 30px;
+            position: absolute;
+            top: -2%;  
+        }
+        .marquee-container {
+          width: 100%;
+          overflow: hidden;
+          display: flex;
+        }
+
+        .marquee-container {
+          overflow: hidden;
+          display: flex;
+        }
+
+        .marquee-content {
+          display: inline-block;
+          white-space: nowrap;
+          animation: marquee 20s linear infinite;
+          position: absolute;
+          top: 10%;
+          right: 5%;
+          font-size: 180%;
+          width: 100%; 
+          height: 50px; 
+        }
+        #teacher1,
+        #teacher2,
+        #teacher3,
+        #teacher4,
+        #teacher5,
+        #teacher6,
+        #teacher7,
+        #teacher8,
+        #teacher9,
+        #teacher10,
+        #teacher11,
+        #teacher12,
+        #teacher13,
+        #teacher14,
+        #teacher15,
+        #teacher16,
+        #teacher17,
+        #teacher18,
+        #teacher19,
+        #teacher20{
+          position: absolute;
+        }
+
+
+
+        @keyframes marquee {
+          0% {
+            transform: translateX(120%);
+          }
+          100% {
+            transform: translateX(-100%);
+          }
+        }
+
+    </style>
+</head>
+<body>
+    <h1 id="title">NTOU CSE電機二館</h1>
+    
+    <div class="marquee-container">
+        <div class="marquee-content">
+          113年專題競賽報名&nbsp;&nbsp;1131學期校內獎學金申請公告&nbsp;&nbsp;114學年度碩博士班甄試簡章
+        </div>
+    </div>
+    
+    <button class="button2" style="left: 1%; top: 18%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 20px;">
+        <span style="font-size: 24px;">B1</span>
+        <span style="font-size: 16px;">th&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        Floor</span>
+    </button>
+    <button class="button3" style="left:   1%; top:  27%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 16px;">B05</button>
+    <button class="button3" style="left:   5%; top:  27%; background-color: transparent;color: rgb(3, 3, 3); font-size: 16px; font-weight: bold">報廢室</button>
+    <button class="button3" style="left:   1%; top:  32%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 16px;">B07</button>
+    <button class="button3" style="left:   5%; top:  32%; background-color: transparent;color: rgb(3, 3, 3); font-size: 16px; font-weight: bold">教室</button>
+    <button class="button3" style="left:   1%; top:  37%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 16px;">B09</button>
+    <button class="button3" style="left:   5%; top:  37%; background-color: transparent;color: rgb(3, 3, 3); font-size: 16px; font-weight: bold">系學會辦公室</button>
+    <button class="button3" style="left:   1%; top:  42%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 16px;">B14</button>
+    <button class="button3" style="left:   5%; top:42.5%; background-color: transparent;color: rgb(3, 3, 3); font-size: 16px; font-weight: bold">教室</button>
+    <button class="button3" style="left:   1%; top:  47%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 16px;">B16</button>
+    <button class="button3" style="left:   5%; top:  47%; background-color: transparent;color: rgb(3, 3, 3); font-size: 16px; font-weight: bold">學生交誼室</button>
+    <button class="button3" style="left:   1%; top:  52%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 16px;">A18</button>
+    <button class="button3" style="left:   5%; top:  52%; background-color: transparent;color: rgb(3, 3, 3); font-size: 16px; font-weight: bold">儲藏室</button>
+
+    <button class="button2" style="left: 1%; top: 58%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 20px;">
+      <span style="font-size: 24px;">1</span>
+      <span style="font-size: 16px;">th &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      Floor</span>
+    </button>
+    <button class="button3" style="left:   1%; top:   67%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 16px;">101</button>
+    <button class="button3" style="left:   5%; top:   67%; background-color: transparent;color: rgb(3, 3, 3); font-size: 16px; font-weight: bold">教室</button>
+    <button class="button3" style="left:   1%; top:   72%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 16px;">105</button>
+    <button class="button3" style="left:   5%; top:   72%; background-color: transparent;color: rgb(3, 3, 3); font-size: 16px; font-weight: bold">教室</button>
+    <button class="button3" style="left:   1%; top:   77%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 16px;">110</button>
+    <button class="button3" style="left:   5%; top:   77%; background-color: transparent;color: rgb(3, 3, 3); font-size: 16px; font-weight: bold">學生實驗室</button>
+    <button class="button3" style="left:   1%; top:   82%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 16px;">112</button>
+    <button class="button3" style="left:   5%; top:   82%; background-color: transparent;color: rgb(3, 3, 3); font-size: 16px; font-weight: bold">研討室</button>
+    <button class="button3" style="left:   1%; top:   87%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 16px;">114</button>
+    <button class="button3" style="left:   5%; top:   87%; background-color: transparent;color: rgb(3, 3, 3); font-size: 16px; font-weight: bold">學生實驗室</button>
+    
+    <button class="button2" style="left: 20.5%; top: 18%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 20px;">
+      <span style="font-size: 24px;">2</span>
+      <span style="font-size: 16px;">th &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      Floor</span>
+      <button class="button3" style="left: 20.5%; top:  27%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 16px;">201</button>
+      <button class="button3" style="left: 24.5%; top:  27%; background-color: transparent;color: rgb(3, 3, 3); font-size: 16px; font-weight: bold">電腦教學實驗室</button>
+      <button class="button3" style="left: 20.5%; top:  32%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 16px;">203</button>
+      <button class="button3" style="left: 24.5%; top:  32%; background-color: transparent;color: rgb(3, 3, 3); font-size: 16px; font-weight: bold">電腦教學實驗室</button>
+      <button class="button3" style="left: 20.5%; top:  37%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 16px;">205</button>
+      <button class="button3" style="left: 24.5%; top:  37%; background-color: transparent;color: rgb(3, 3, 3); font-size: 16px; font-weight: bold">iMac電腦教學實驗室</button>
+      <button class="button3" style="left: 20.5%; top:  42%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 16px;">210</button>
+      <button class="button3" style="left: 24.5%; top:  42%; background-color: transparent;color: rgb(3, 3, 3); font-size: 16px; font-weight: bold">機房</button>
+      <button class="button3" style="left: 20.5%; top:  47%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 16px;">212</button>
+      <button class="button3" style="left: 24.5%; top:  47%; background-color: transparent;color: rgb(3, 3, 3); font-size: 16px; font-weight: bold">討論室</button>
+        
+
+
+      <button class="button2" style="left:20.5%; top: 53%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 20px;">
+        <span style="font-size: 24px;">3</span>
+        <span style="font-size: 16px;">th &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        Floor</span>
+      <button class="button3" style="left: 20.5%; top:  62%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 16px;">301</button>
+      <button class="button3" style="left: 24.5%; top:  62%; background-color: transparent;color: rgb(3, 3, 3); font-size: 16px; font-weight: bold">電腦教學實驗室</button>
+      <button class="button3" style="left: 20.5%; top:  67%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 16px;">303</button>
+      <button class="button3" style="left: 24.5%; top:  67%; background-color: transparent;color: rgb(3, 3, 3); font-size: 16px; font-weight: bold">視聽教室</button>
+      <button class="button3" style="left: 20.5%; top:  72%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 16px;">305</button>
+      <button class="button3" style="left: 24.5%; top:  72%; background-color: transparent;color: rgb(3, 3, 3); font-size: 16px; font-weight: bold">會議室</button>
+      <button class="button3" style="left: 20.5%; top:  77%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 16px;">308</button>
+      <button class="button3" style="left: 24.5%; top:  77%; background-color: transparent;color: rgb(3, 3, 3); font-size: 16px; font-weight: bold">較室休息室</button>
+      <button class="button3" style="left: 20.5%; top:  82%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 16px;">310</button>
+      <button class="button3" style="left: 24.5%; top:  82%; background-color: transparent;color: rgb(3, 3, 3); font-size: 16px; font-weight: bold">系主任辦公室</button>
+      <button class="button3" style="left: 20.5%; top:  87%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 16px;">312</button>
+      <button class="button3" style="left: 24.5%; top:  87%; background-color: transparent;color: rgb(3, 3, 3); font-size: 16px; font-weight: bold">系辦公室</button>
+
+
+      <button class="button2" style="left: 40%; top: 18%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 20px;">
+        <span style="font-size: 24px;">4</span>
+        <span style="font-size: 16px;">th &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        Floor</span>
+      <button class="button3" style="left:40%; top:  27%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 16px;">401</button>
+      <button class="button3" style="left:44%; top:  27%; background-color: transparent;color: rgb(3, 3, 3); font-size: 16px; font-weight: bold">智慧型軟體工程實驗室</button>
+      <button class="button3" style="left:40%; top:  32%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 16px;">403</button>
+      <button class="button3" style="left:44%; top:  32%; background-color: transparent;color: rgb(3, 3, 3); font-size: 16px; font-weight: bold">智慧型系統實驗室</button>
+      <button class="button3" style="left:40%; top:  37%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 16px;">405</button>
+      <button class="button3" style="left:44%; top:  37%; background-color: transparent;color: rgb(3, 3, 3); font-size: 16px; font-weight: bold">智慧型生醫實驗室</button>
+      <button class="button3" style="left:40%; top:  42%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 16px;">407</button>
+      <button class="button3" style="left:44%; top:  42%; background-color: transparent;color: rgb(3, 3, 3); font-size: 16px; font-weight: bold">研討室</button>
+      <button class="button3" style="left:40%; top:  47%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 16px;">408</button>
+      <button class="button3" id = "teacher1"style="left:44%; top:  47%; background-color: transparent;color: rgb(3, 3, 3); font-size: 16px; font-weight: bold">程華淮 教師研究室</button>
+      <button class="button3" style="left:40%; top:  52%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 16px;">409</button>
+      <button class="button3" style="left:44%; top:  52%; background-color: transparent;color: rgb(3, 3, 3); font-size: 16px; font-weight: bold">研討室</button>
+      <button class="button3" style="left:40%; top:  57%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 16px;">410</button>
+      <button class="button3" id = "teacher2" style="left:44%; top:  57%; background-color: transparent;color: rgb(3, 3, 3); font-size: 16px; font-weight: bold">張欽圳 教師研究室</button>
+      <button class="button3" style="left:40%; top:  62%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 16px;">412</button>
+      <button class="button3" id = "teacher3" style="left:44%; top:  62%; background-color: transparent;color: rgb(3, 3, 3); font-size: 16px; font-weight: bold">葉春超 教師研究室</button>
+      <button class="button3" style="left:40%; top:  67%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 16px;">414</button>
+      <button class="button3" style="left:44%; top:  67%; background-color: transparent;color: rgb(3, 3, 3); font-size: 16px; font-weight: bold">高速通訊計算機實驗室</button>
+
+
+
+      <button class="button2" style="left: 40%; top: 73%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 20px;">
+        <span style="font-size: 24px;">5</span>
+        <span style="font-size: 16px;">th &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        Floor</span>
+      <button class="button3" style="left:  40%; top:82%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 16px;">501</button>
+      <button class="button3" style="left:  44%; top:82%; background-color: transparent;color: rgb(3, 3, 3); font-size: 16px; font-weight: bold">資訊安全實驗室</button>
+      <button class="button3" style="left:  40%; top:87%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 16px;">503</button>
+      <button class="button3" style="left:  44%; top:87%; background-color: transparent;color: rgb(3, 3, 3); font-size: 16px; font-weight: bold">電腦圖學教室</button>
+      <button class="button3" style="left:  40%; top:92%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 16px;">505</button>
+      <button class="button3" style="left:  44%; top:92%; background-color: transparent;color: rgb(3, 3, 3); font-size: 16px; font-weight: bold">嵌入式系統實驗室</button>
+      <button class="button3" style="left:59.5%; top:18%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 16px;">507</button>
+      <button class="button3" id = "teacher4" style="left:63.5%; top:18%; background-color: transparent;color: rgb(3, 3, 3); font-size: 16px; font-weight: bold">蔡東佐 教師研究室</button>
+      <button class="button3" style="left:59.5%; top:23%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 16px;">508</button>
+      <button class="button3" style="left:63.5%; top:23%; background-color: transparent;color: rgb(3, 3, 3); font-size: 16px; font-weight: bold">教師研究室</button>
+      <button class="button3" style="left:59.5%; top:28%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 16px;">509</button>
+      <button class="button3" id = "teacher5" style="left:63.5%; top:28%; background-color: transparent;color: rgb(3, 3, 3); font-size: 16px; font-weight: bold">蔡宇軒 教師研究室</button>
+      <button class="button3" style="left:59.5%; top:33%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 16px;">510</button>
+      <button class="button3" id = "teacher6" style="left:63.5%; top:33%; background-color: transparent;color: rgb(3, 3, 3); font-size: 16px; font-weight: bold">翁世光 教師研究室</button>
+      <button class="button3" style="left:59.5%; top:38%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 16px;">511</button>
+      <button class="button3" id = "teacher7" style="left:63.5%; top:38%; background-color: transparent;color: rgb(3, 3, 3); font-size: 16px; font-weight: bold">李孟書 教師研究室</button>
+      <button class="button3" style="left:59.5%; top:43%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 16px;">512</button>
+      <button class="button3" id = "teacher8" style="left:63.5%; top:43%; background-color: transparent;color: rgb(3, 3, 3); font-size: 16px; font-weight: bold">丁培毅 教師研究室</button>
+      <button class="button3" style="left:59.5%; top:48%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 16px;">514</button>
+      <button class="button3" id = "teacher9" style="left:63.5%; top:48%; background-color: transparent;color: rgb(3, 3, 3); font-size: 16px; font-weight: bold">張光遠 教師研究室</button>
+      <button class="button3" style="left:59.5%; top:53%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 16px;">516</button>
+      <button class="button3" id = "teacher10" style="left:63.5%; top:53%; background-color: transparent;color: rgb(3, 3, 3); font-size: 16px; font-weight: bold">許玉平 教師研究室</button>
+
+
+      <button class="button2" style="left: 59.5%; top: 59%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 20px;">
+        <span style="font-size: 24px;">6</span>
+        <span style="font-size: 16px;">th &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        Floor</span>
+      <button class="button3" style="left:59.5%; top:  68%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 16px;">601</button>
+      <button class="button3" style="left:63.5%; top:  68%; background-color: transparent;color: rgb(3, 3, 3); font-size: 16px; font-weight: bold">超大型積體電路實驗室</button>
+      <button class="button3" style="left:59.5%; top:  73%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 16px;">603</button>
+      <button class="button3" style="left:63.5%; top:  73%; background-color: transparent;color: rgb(3, 3, 3); font-size: 16px; font-weight: bold">智慧型多媒體實驗室</button>
+      <button class="button3" style="left:59.5%; top:  78%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 16px;">605</button>
+      <button class="button3" style="left:63.5%; top:  78%; background-color: transparent;color: rgb(3, 3, 3); font-size: 16px; font-weight: bold">資料庫實驗室</button>
+      <button class="button3" style="left:59.5%; top:  83%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 16px;">607</button>
+      <button class="button3" id = "teacher11" style="left:63.5%; top:  83%; background-color: transparent;color: rgb(3, 3, 3); font-size: 16px; font-weight: bold">馬永昌 教師研究室</button>
+      <button class="button3" style="left:59.5%; top:  88%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 16px;">608</button>
+      <button class="button3" id = "teacher12" style="left:63.5%; top:  88%; background-color: transparent;color: rgb(3, 3, 3); font-size: 16px; font-weight: bold">阮義聰 教師研究室</button>
+      <button class="button3" style="left:59.5%; top:  93%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 16px;">609</button>
+      <button class="button3" id = "teacher13" style="left:63.5%; top:  93%; background-color: transparent;color: rgb(3, 3, 3); font-size: 16px; font-weight: bold">林川傑 教師研究室</button>
+      <button class="button3" style="left:  79%; top:  18%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 16px;">610</button>
+      <button class="button3" id = "teacher14" style="left:  83%; top:  18%; background-color: transparent;color: rgb(3, 3, 3); font-size: 16px; font-weight: bold">鄭錫齊 教師研究室</button>
+      <button class="button3" style="left:  79%; top:  23%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 16px;">611</button>
+      <button class="button3" id = "teacher15" style="left:  83%; top:  23%; background-color: transparent;color: rgb(3, 3, 3); font-size: 16px; font-weight: bold">林韓禹 教師研究室</button>
+      <button class="button3" style="left:  79%; top:  28%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 16px;">612</button>
+      <button class="button3" id = "teacher16" style="left:  83%; top:  28%; background-color: transparent;color: rgb(3, 3, 3); font-size: 16px; font-weight: bold">林清池 教師研究室</button>
+      <button class="button3" style="left:  79%; top:  33%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 16px;">614</button>
+      <button class="button3" id = "teacher17" style="left:  83%; top:  33%; background-color: transparent;color: rgb(3, 3, 3); font-size: 16px; font-weight: bold">趙志民 教師研究室</button>
+      <button class="button3" style="left:  79%; top:  38%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 16px;">616</button>
+      <button class="button3" id = "teacher18" style="left:  83%; top:  38%; background-color: transparent;color: rgb(3, 3, 3); font-size: 16px; font-weight: bold;">張雅惠 教師研究室</button>
+      <button class="button3" style="left:  79%; top:  43%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 16px;">618</button>
+      <button class="button3" id = "teacher19" style="left:  83%; top:  43%; background-color: transparent;color: rgb(3, 3, 3); font-size: 16px; font-weight: bold;">嚴茂旭 教師研究室</button>
+      <button class="button3" style="left:  79%; top:  48%; background-color: rgba(11, 22, 179, 0.993); color: white; font-size: 16px;">634</button>
+      <button class="button3" id = "teacher20" style="left:  83%; top:  48%; background-color: transparent;color: rgb(3, 3, 3); font-size: 16px; font-weight: bold;">許為元 教師研究室</button>
+    
+
+
+
+
+
+
+
+  
+
+
+    <button class="button4" style="right: 14%; top: 58%; border-color: rgba(37, 143, 243, 0.492);background-color: rgb(37, 143, 243);"></button>
+    <button class="button3" style="left: 86.2%; top: 57.4%; background-color: transparent;color: rgb(3, 3, 3); font-size: 16px; font-weight: bold">教授在研究室</button>
+    <button class="button4" style="right: 14%; top: 65%; border-color: rgba(37, 143, 243, 0.492);background-color: transparent;"></button>
+    <button class="button3" style="left: 86.2%; top: 64.4%; background-color: transparent;color: rgb(3, 3, 3); font-size: 16px; font-weight: bold">教授外出</button>
+    <button class = "button1" style="top: 8%; padding: 20px 40px; width: 100%"></button>
+    <button class = "button2" style="right: 5%; top: 80%; background-color: rgba(37, 143, 243, 0.492); border-radius: 50px; font-weight: bold;"  onclick="location.href='home.html'">電综大樓首頁</button>
+    
+
+</body>
+</html>

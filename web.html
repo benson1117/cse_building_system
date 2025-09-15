@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name=”viewport” content="width = device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <title>海洋大學資訊工程學系系館管理中心</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+  <script src="https://apis.google.com/js/api.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://apis.google.com/js/client.js?onload=initClient"></script>
+  <script >
+    $(document).ready(function() {
+      var floor_chooser = 7;
+      var selectedFloor = floor_chooser;
+      var numToiletsPerFloor = [2, 3, 3, 3, 3, 1]; // 每层的厕所数量
+      var light = [0,7,8,14,14,14,13,13,16,15];
+      var lighting = [];
+      var doorstatus = [];
+      var numdoor=[0,22,25,30,27,25,23,24,25,24];
+      var door = [9,0,0,0,0,0,0,0,0,0];
+      var trash = [0,2,1,1,1,1,1,1,1,1];
+      var trashstatus = [];
+      var f;
+      var fa = f;
+      var statusf = 0; 
+      var selectf;
+      // 选择Excel文件并读取数据
+      
+      showFloor(floor_chooser);
+      setInterval(exefunc, 1000);///////
+      function showFloor(floor) {
+        f=floor
+        checkdoors();
+        clearToiletStatus();
+        $('.floor-plan').hide();        
+        $('#floor' + floor).show();
+        displaytrashcan(floor);
+        $('#floorSelector button').removeClass('current-floor');
+        $('#floorSelector button[data-floor="' + floor + '"]').addClass('current-floor');
+        showlight(floor);
+        showdoor(floor);
+        updatesfloor(floor);
+        problem();
+        fetchClassroomData();
+        fetchtrashData();
+      }
+      function exefunc(){
+        fetchClassroomData();
+        fetchtrashData();
+        problem();
+        if(statusf !=1){
+          showFloor(selectedFloor);
+        }
+        else{
+          showFloor(selectf);
+        }
+      }
+      
+        function updatesfloor(floor){
+          var floorElement = $('#floors' + floor); 
+          floorElement.text(floor+'樓平面圖')
+                      .css('color', '#546A7B')
+                      .css('position', 'fixed') // 或 'relative', 'fixed', 'sticky'
+                      .css('top', '85%')          // 根据需要调整
+                      .css('left', '72%'); 
+        
+        }
+		
+        function clearToiletStatus() {
+          // 清除所有厕所状态
+          for (var i = 1; i <= 15; i++) {
+            var toiletElement = $('#toilet' + i);
+            toiletElement.text('').css('color', '').css('background-color', ''); // 清除文本和颜色
+          }
+          for (var i = 1; i <= 9; i++) {
+              var floorElement = $('#floors' + i);
+              floorElement.text('').css('color', '').css('background-color', ''); // 清除文本和颜色
+            }
+        }
+		//////////////////////////////////////////////////////////////$('#trashcan'+floor).show();$('.trash').hide();
+    
+    /////////////////////////////////////////////////////////////
+    
+    // 定義一個異步函數來獲取和處理班級數據
+
+    async function fetchtrashData() {
+      try {
+          const response = await fetch('http://192.168.0.109:5000/get_trash_data');
+          
+          if (!response.ok) {
+              throw new Error('HTTP 错误! 状态码: ' + response.status);
+          }
+  
+          const data = await response.json();
+          console.log(data);
+          var count = 0;
+          data.forEach(item => {
+          if (item.full !== null) {
+              trashstatus[count]=item.full;
+              count++;
+          }
+      })
+       
+      } catch (error) {
+          console.error('获取数据时发生错误:', error);
+      }
+  }
+  
+  async function cleanOldData() {
+    try {
+        const response = await fetch('http://192.168.0.109:5000/clean-data', {
+            method: 'POST', // POST 請求
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error('HTTP 錯誤! 狀態碼: ' + response.status);
+        }
+
+        const result = await response.json(); // 獲取 JSON 響應
+        console.log(result);
+
+        if (result.message) {
+            console.log('成功:', result.message);
+        } else if (result.error) {
+            console.log('錯誤:', result.error);
+        }
+
+    } catch (error) {
+        console.error('發生錯誤:', error);
+    }
+}
+
+    async function fetchClassroomData() {
+        try {
+            const response = await fetch('http://192.168.0.109:5000/get_classroom_data');
+            
+            if (!response.ok) {
+                throw new Error('HTTP 错误! 状态码: ' + response.status);
+            }
+    
+            const data = await response.json();
+            console.log(data);
+            var count = 0;
+            var count2 = 0;
+            data.forEach(item => {
+            if (item.door_1_status !== null) {
+                doorstatus[count]=item.door_1_status;
+                count++;
+            }
+            if (item.door_2_status !== null) {
+              doorstatus[count]=item.door_2_status;
+              count++;
+            }
+            if (item.door_3_status !== null) {
+              doorstatus[count]=item.door_3_status;
+              count++;
+            }
+            if(item.lightstatus !== null) {
+              lighting[count2]=item.lightstatus;
+              count2++;}
+        })
+
+      
+            // 处理获取的数据
+            // 比如：将数据渲染到网页上
+            // renderClassroomData(data);
+    
+        } catch (error) {
+            console.error('获取数据时发生错误:', error);
+        }
+    }
+
+    function showdoor(floor) {
+    $('.door').hide(); 
+    var doors = 0;
+
+
+    for (var j = 0; j < floor; j++) {
+        doors += numdoor[j];
+    }
+
+
+    for (var i = doors; i < doors + numdoor[floor]; i++) {
+        if (doorstatus[i] == 1) {
+            $('#door' + i).show().addClass('door'); 
+        } else {
+            $('#door' + i).hide(); 
+        }
+    }
+}
+
+    function checkdoors(){
+      var doors=0;
+      for(var j = 1; j < 10 ; j++){
+        for (var i = doors; i < doors+numdoor[j] ; i++){
+        if(doorstatus[i]==1){ 
+          door[j]=1;
+      }
+      }
+      doors = doors+numdoor[j];
+    }
+    }
+    function showlight(floor){
+      $('.light').hide();
+      var lights = 0;
+      for(var j = 0; j < floor ; j++){
+        lights = lights+light[j];
+      }
+      for (var i = lights; i < lights+light[floor] ; i++){
+        if(lighting[i]==1){
+          $('#light' + i).show();
+        }
+      }
+    }
+
+
+    function displaytrashcan(floor){
+      $('.trash').hide();
+      $('.trash2').hide();
+      $('#snow0').show()
+      $('#snow1').show()
+      $('#snow2').show()
+      $('#snow3').show()
+      $('#snow4').show()
+        if(floor==1){
+          if(trashstatus[0]==0){
+            $('#trashcan0').show()
+          }
+          else{
+            $('#trashcan10').show()
+          }
+          if(trashstatus[1]==0){
+            $('#trashcan1').show()
+          }
+          else{
+            $('#trashcan11').show()
+          }
+        }
+        else if(floor==2){
+          if(trashstatus[2]==0){
+            $('#trashcan2').show()
+          }
+          else{
+            $('#trashcan12').show()
+          }
+        }
+        else if(floor==3){
+          if(trashstatus[3]==0){
+            $('#trashcan3').show()
+          }
+          else{
+            $('#trashcan13').show()
+          }
+        }
+        else if(floor==4){
+          if(trashstatus[4]==0){
+            $('#trashcan4').show()
+          }
+          else{
+            $('#trashcan14').show()
+          }
+        }
+        else if(floor==5){
+          if(trashstatus[5]==0){
+            $('#trashcan5').show()
+          }
+          else{
+            $('#trashcan15').show()
+          } 
+        }
+        else if(floor==6){
+          if(trashstatus[6]==0){
+            $('#trashcan6').show()
+          }
+          else{
+            $('#trashcan16').show()
+          }
+        }
+        else if(floor==7){
+          if(trashstatus[7]==0){
+            $('#trashcan7').show()
+          }
+          else{
+            $('#trashcan17').show()
+          }
+        }
+        else if(floor==8){
+          if(trashstatus[8]==0){
+            $('#trashcan8').show()
+          }
+          else{
+            $('#trashcan18').show()
+          }
+        }
+        else if(floor==9){
+          if(trashstatus[9]==0){
+            $('#trashcan9').show()
+          }
+          else{
+            $('#trashcan19').show()
+          }
+        }
+    }
+
+
+    function problem(){ 
+      checkdoors();
+        for( var i = 1; i<10 ; i++){
+            if(door[i]==1){
+              var exclamation = $('#exclamation' + i);
+              exclamation.text('!')
+                          .css('color', '#FF0000')
+
+            }
+            else{
+              var exclamation = $('#exclamation' + i);
+              exclamation.text('!')
+                          .css('color', 'transparent')
+            };
+        }
+        for(var j = 1; j < 10; j++){
+          if(trashstatus[j]==1){
+              if(j==1||j==2){
+              var exclamation = $('#exclamation1');
+              exclamation.text('!')
+                          .css('color', '#FF0000')
+              }
+              if(j==3){
+              var exclamation = $('#exclamation2');
+              exclamation.text('!')
+                          .css('color', '#FF0000')
+              }
+              if(j==4){
+              var exclamation = $('#exclamation3');
+              exclamation.text('!')
+                          .css('color', '#FF0000')
+              }
+              if(j==5){
+              var exclamation = $('#exclamation4');
+              exclamation.text('!')
+                          .css('color', '#FF0000')
+              }
+              if(j==6){
+              var exclamation = $('#exclamation5');
+              exclamation.text('!')
+                          .css('color', '#FF0000')
+              }
+              if(j==7){
+              var exclamation = $('#exclamation6');
+              exclamation.text('!')
+                          .css('color', '#FF0000')
+              }
+              if(j==8){
+              var exclamation = $('#exclamation7');
+              exclamation.text('!')
+                          .css('color', '#FF0000')
+              }
+              if(j==9){
+              var exclamation = $('#exclamation8');
+              exclamation.text('!')
+                          .css('color', '#FF0000')
+              }
+              if(j==10){
+              var exclamation = $('#exclamation9');
+              exclamation.text('!')
+                          .css('color', '#FF0000')
+              }
+          }
+        }
+
+    }
+
+    // function updateToiletStatus(floor) {
+    //     var startIndex = 0;
+    //     for (var i = 1; i < floor; i++) {
+    //       startIndex += numToiletsPerFloor[i - 1]; 
+    //     }
+
+    //     var endIndex = startIndex + numToiletsPerFloor[floor - 1];
+
+    //     for (var i = startIndex; i < endIndex; i++) {
+    //       var toiletElement = $('#toilet' + (i + 1)); // 厕所编号从1开始
+
+
+
+    //       toiletElement.text('故障').css('color', 'gray').css('background-color', 'rgba(128, 128, 128, 0.5)').css('padding', '5px');
+
+    //     }
+    //   }
+
+        var a=0;
+      
+        $(document).ready(function() {
+          
+          if(a==0) {
+            fa = f; // 默认选定的楼层为1楼
+            
+          }
+          // 当鼠标悬停在楼层按钮上时
+          $('#floorSelector button').hover(
+              
+             function() {
+              statusf = 1;
+               a=1;
+               selectf = $(this).data('floor'); // 更新选定的楼层
+               showFloor(selectf); // 显示相应楼层的内容
+             },
+             function() {
+               showFloor(fa); // 鼠标移出时恢复选定的楼层内容
+               statusf = 0;
+               a=0;
+             }
+          );
+          $('#floorSelector button').click(function() {
+            selectedFloor = $(this).data('floor');
+            fa = selectedFloor; // 更新固定楼层
+            showFloor(fa); // 显示选定的楼层
+            a = 0; // 将 a 设为 0，以便鼠标移出时不再改变楼层
+        }); 
+        });
+        
+        
+    });
+    
+  </script>
+  <style>
+    #bgvid {
+      position: fixed;
+      right: 0;
+      bottom: 0;
+      min-width: 100%;
+      min-height: 100%;
+      width: auto;
+      height: auto;
+      z-index: -100;
+      background-size: cover;
+    }
+    .floor-plan {
+      display: none;
+    }
+
+    #floorSelector {
+        display: flex;
+        flex-direction: column-reverse;
+        position: fixed;
+        right: 25px;
+        top: 5px;
+    }
+
+    #floorSelector button {
+      margin: 5px;
+      padding: 12px 24px;
+      font-size: 20px;
+    }
+    #floorContainer{
+      text-align: center;
+      position: relative;
+    }
+    .floor-plan{
+      z-index: -1;
+      height: 60%;
+      width: 83% ;
+      position: relative;
+      position: fixed;
+      top: 20%;
+      right: 15%;
+    }
+    .current-floor {
+      background-color: rgba(9, 75, 119, 0.589);;
+      color: rgb(0, 0, 0);
+    }
+    h1 {
+      color: rgba(153, 222, 207, 0.793);
+    }
+    #a1{
+      position: absolute;
+      float: left;
+    }
+    a{
+      color: rgba(188, 140, 140, 1);
+      
+    }
+    #announcement{
+      background-color: rgba(217, 225, 227, 0.492);
+      color: rgba(153, 222, 207, 0.793);
+      font-size: 30px;
+      padding: 8px 16px;
+      border-radius: 50px;
+      line-height:55px;
+    }
+    #announcement {
+      position:fixed; 
+      top:12%; 
+      right: 12%; 
+      width: 70%; 
+      height: 50px; 
+      overflow: auto; 
+    }
+    #announcementText {
+      margin-left: 8%;
+      overflow-y: scroll; /* 显示垂直方向的滚动条 */
+       height: 99%; /* 设置高度为容器的100% */
+       box-sizing:content-box /* 确保高度包含内边距和边框 */
+    }
+    ::-webkit-scrollbar {
+      display: none;
+    }
+    button {
+      padding: 8px 16px;
+      border: none;
+      cursor: pointer;
+      margin-top: 5px;
+      border-radius: 50px;
+      background-color: rgba(90, 168, 233, 0.568);
+    }
+
+    #i{
+      display: flex; /* 或者使用 display: inline-block; */
+      position: fixed;
+      top: 4%;
+      left: 20%;
+    }
+    #img{
+      background-color: transparent;
+    }
+    #button12 button{
+      margin-left: 10px;
+    }
+    #button12 {
+      
+      margin-top: 10%;
+      margin-left: 10px; 
+      font-size:25px;
+      border-radius: 25px
+    }
+
+    #toilet1,
+    #toilet2,
+    #toilet3,
+    #toilet4,
+    #toilet5,
+    #toilet6,
+    #toilet7,
+    #toilet8,
+    #toilet9,
+    #toilet10,
+    #toilet11,
+    #toilet12,
+    #toilet13,
+    #toilet14,
+    #toilet15{
+      position: absolute;
+      font-weight: bold;
+    }
+    #floors1,
+    #floors2,
+    #floors3,
+    #floors4,
+    #floors5,
+    #floors6,
+    #floors7,
+    #floors8,
+    #floors9{
+      position: absolute;
+      font-weight: bold;
+      font-size :50px;
+      align-items: stretch;
+    }
+     #title{  
+         color:rgb(30, 69, 95);
+         font-size: 40px;
+         position: fixed; 
+          top: -1%;  
+         right: 30%; 
+     }
+     .exclamationcontainer{
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        margin-top: -8px;
+        right: 25px;
+        top: 10px;
+        gap:24px;
+    } 
+     #exclamation1,
+     #exclamation2,
+     #exclamation3,
+     #exclamation4,
+     #exclamation5,
+     #exclamation6,
+     #exclamation7,
+     #exclamation8,
+     #exclamation9
+     {
+      color:rgb(243, 12, 12);
+      font-size: 32px;
+      font-weight: bold;
+     }
+
+     .trash{
+      height: 5%;
+      width: 2% ;
+      position: relative;
+      position: fixed;
+    }
+
+    .trash2{
+      height: 10%;
+      width: 4% ;
+      position: relative;
+      position: fixed;
+
+    }
+    .lightcontainer {
+      background: transparent; /* 背景透明 */
+    }
+
+    .light {
+        position: fixed; /* 使用絕對定位 */
+        border-radius: 0px;
+     }
+
+
+    .doorcontainer {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      background: transparent;
+    }
+
+    .door {
+      background-color: rgba(234, 11, 11, 0.744);
+      animation: blink 1s infinite;
+        position: fixed;
+        z-index: 20; 
+        padding: 10px 5px;
+        font-size: 16px;
+        cursor: pointer;
+     }
+    @keyframes blink{
+      from{
+        opacity: 1;
+      }
+      to{
+        opacity: 0;
+      }
+    }
+
+  </style>
+</head>
+<body>
+  <!-- <img id="bgvid" src="https://cdn.pixabay.com/photo/2017/02/08/12/46/moon-2048727_1280.jpg"> -->
+  <button id="fileInput" style="background-color: rgba(83, 255, 218, 0);">
+    <h1 id="title">海洋大學綜合教學大樓管理中心</h1>
+  </button>
+  <br>
+  
+  <div class="lightcontainer">
+
+     <!-- 一樓燈 -->
+
+    <button class="light" id="light0" style ="left:  19%; top:  28%; background-color: rgba(246, 250, 8, 0.555); padding: 45px 55px;" ></button2>
+    <button class="light" id="light1" style ="left: 7.5%; top:23.5%; background-color: rgba(246, 250, 8, 0.555); padding: 60px 55px;" ></button2>
+    <button class="light" id="light2" style ="left: 7.5%; top:49.5%; background-color: rgba(246, 250, 8, 0.555); padding: 60px 55px;" ></button2>
+    <button class="light" id="light3" style ="left:55.5%; top:  28%; background-color: rgba(246, 250, 8, 0.555); padding: 45px 55px;" ></button>
+    <button class="light" id="light4" style ="left:  67%; top:23.5%; background-color: rgba(246, 250, 8, 0.555); padding: 60px 65px;" ></button>
+    <button class="light" id="light5" style ="left:  67%; top:49.5%; background-color: rgba(246, 250, 8, 0.555); padding: 60px 65px;" ></button>
+    <button class="light" id="light6" style ="left:20.5%; top:49.5%; background-color: rgba(246, 250, 8, 0.555); padding: 15px 15px;" ></button>
+    
+
+    <!------------------------------------------------------------------------------------------------------------------------------------------------->
+
+
+    <!-- 2樓燈 -->
+
+    <button class="light" id="light7"  style ="left:19.5%; top:  26%; background-color: rgba(246, 250, 8, 0.555); padding:50px 58px;" ></button>
+    <button class="light" id="light8"  style ="left:   8%; top:  22%; background-color: rgba(246, 250, 8, 0.555); padding:60px 57px;" ></button>
+    <button class="light" id="light9"  style ="left:   8%; top:  50%; background-color: rgba(246, 250, 8, 0.555); padding:60px 56px;" ></button>
+    <button class="light" id="light10" style ="left:  57%; top:26.5%; background-color: rgba(246, 250, 8, 0.555); padding:50px 60px;" ></button>
+    <button class="light" id="light11" style ="left:  69%; top:  22%; background-color: rgba(246, 250, 8, 0.555); padding:60px 68px;" ></button>
+    <button class="light" id="light12" style ="left:  69%; top:  43%; background-color: rgba(246, 250, 8, 0.555); padding:82px 68px;" ></button>
+    <button class="light" id="light13" style ="left:   8%; top:  43%; background-color: rgba(246, 250, 8, 0.555); padding:20px 56px;" ></button>
+    <button class="light" id="light14" style ="left:  20%; top:49.5%; background-color: rgba(246, 250, 8, 0.555); padding:15px 26px;" ></button>
+
+    <!------------------------------------------------------------------------------------------------------------------------------------------------->
+
+    <!-- 3樓燈 -->
+    <button class="light" id="light15" style ="left:  38%; top:  52%; background-color: rgba(246, 250, 8, 0.555); padding:  38px 70px;" ></button>
+    <button class="light" id="light16" style ="left:32.5%; top:  52%; background-color: rgba(246, 250, 8, 0.555); padding:  38px 36px;" ></button>
+    <button class="light" id="light17" style ="left:32.5%; top:  28%; background-color: rgba(246, 250, 8, 0.555); padding:  52px 23px;" ></button>
+    <button class="light" id="light18" style ="left:44.5%; top:  28%; background-color: rgba(246, 250, 8, 0.555); padding:  52px 30px;" ></button>
+    <button class="light" id="light19" style ="left:  36%; top:  28%; background-color: rgba(246, 250, 8, 0.555); padding:  52px 55px;" ></button>
+    <button class="light" id="light20" style ="left:16.5%; top:  28%; background-color: rgba(246, 250, 8, 0.555); padding:  52px 62px;" ></button>
+    <button class="light" id="light21" style ="left:   4%; top:  23%; background-color: rgba(246, 250, 8, 0.555); padding:  65px 62px;" ></button>
+    <button class="light" id="light22" style ="left:   4%; top:  53%; background-color: rgba(246, 250, 8, 0.555); padding:  62px 60px;" ></button>
+    <button class="light" id="light23" style ="left:55.5%; top:  28%; background-color: rgba(246, 250, 8, 0.555); padding:  52px 60px;" ></button>
+    <button class="light" id="light24" style ="left:67.5%; top:  23%; background-color: rgba(246, 250, 8, 0.555); padding: 145px 72px;" ></button>
+    <button class="light" id="light25" style ="left: 6.5%; top:45.5%; background-color: rgba(246, 250, 8, 0.555); padding:  25px 45px;" ></button>
+    <button class="light" id="light26" style ="left:  49%; top:  52%; background-color: rgba(246, 250, 8, 0.555); padding:  20px 35px;" ></button>
+    <button class="light" id="light27" style ="left:  27%; top:  52%; background-color: rgba(246, 250, 8, 0.555); padding:  20px 35px;" ></button>
+    <button class="light" id="light28" style ="left:60.5%; top:  52%; background-color: rgba(246, 250, 8, 0.555); padding:  18px 22px;" ></button>
+    
+    <!------------------------------------------------------------------------------------------------------------------------------------------------->
+
+    <!-- 4樓燈 -->
+
+    <button class="light" id="light29" style ="left:  34%; top:  27%; background-color: rgba(246, 250, 8, 0.555); padding:   50px   64px;" ></button>
+    <button class="light" id="light30" style ="left:  44%; top:  27%; background-color: rgba(246, 250, 8, 0.555); padding:   50px   23px;" ></button>
+    <button class="light" id="light31" style ="left:47.5%; top:  27%; background-color: rgba(246, 250, 8, 0.555); padding:   50px   22px;" ></button>
+    <button class="light" id="light32" style ="left:33.8%; top:  50%; background-color: rgba(246, 250, 8, 0.555); padding:   35px   36px;" ></button>
+    <button class="light" id="light33" style ="left:  39%; top:  50%; background-color: rgba(246, 250, 8, 0.555); padding:   35px   42px;" ></button>
+    <button class="light" id="light34" style ="left:  45%; top:  50%; background-color: rgba(246, 250, 8, 0.555); padding:   35px   38px;" ></button>
+    <button class="light" id="light35" style ="left:17.5%; top:  27%; background-color: rgba(246, 250, 8, 0.555); padding:   49px   65px;" ></button>
+    <button class="light" id="light36" style ="left: 6.5%; top:  27%; background-color: rgba(246, 250, 8, 0.555); padding:   49px   70px;" ></button>
+    <button class="light" id="light37" style ="left: 6.5%; top:51.5%; background-color: rgba(246, 250, 8, 0.555); padding:   56px 55.5px;" ></button>
+    <button class="light" id="light38" style ="left:  57%; top:27.5%; background-color: rgba(246, 250, 8, 0.555); padding:   49px 62.5px;" ></button>
+    <button class="light" id="light39" style ="left:69.5%; top:27.5%; background-color: rgba(246, 250, 8, 0.555); padding:  124px   69px;" ></button>
+    <button class="light" id="light40" style ="left:  61%; top:55.5%; background-color: rgba(246, 250, 8, 0.555); padding:   36px   41px;" ></button>
+    <button class="light" id="light41" style ="left: 6.5%; top:44.5%; background-color: rgba(246, 250, 8, 0.555); padding:   20px   56px;" ></button>
+    <button class="light" id="light42" style ="left:  61%; top:  50%; background-color: rgba(246, 250, 8, 0.555); padding: 15.5px 30.4px;" ></button>
+    <!------------------------------------------------------------------------------------------------------------------------------------------------->
+
+    <!-- 5樓燈 -->
+
+    <button class="light" id="light43" style ="left:31.3%; top:24.7%; background-color: rgba(246, 250, 8, 0.555); padding:  52px   62px;" ></button>
+    <button class="light" id="light44" style ="left:  41%; top:24.7%; background-color: rgba(246, 250, 8, 0.555); padding:  51px   21px;" ></button>
+    <button class="light" id="light45" style ="left:44.5%; top:24.7%; background-color: rgba(246, 250, 8, 0.555); padding:  51px   19px;" ></button>
+    <button class="light" id="light46" style ="left:  31%; top:49.5%; background-color: rgba(246, 250, 8, 0.555); padding:  33px   35px;" ></button>
+    <button class="light" id="light47" style ="left:36.3%; top:49.6%; background-color: rgba(246, 250, 8, 0.555); padding:  33px   36px;" ></button>
+    <button class="light" id="light48" style ="left:  42%; top:49.6%; background-color: rgba(246, 250, 8, 0.555); padding:  32px   34px;" ></button>
+    <button class="light" id="light49" style ="left:15.5%; top:24.7%; background-color: rgba(246, 250, 8, 0.555); padding:  49px   61px;" ></button>
+    <button class="light" id="light50" style ="left:   5%; top:24.7%; background-color: rgba(246, 250, 8, 0.555); padding:  49px   66px;" ></button>
+    <button class="light" id="light51" style ="left:  54%; top:24.9%; background-color: rgba(246, 250, 8, 0.555); padding:  51px 57.5px;" ></button>
+    <button class="light" id="light52" style ="left:66.1%; top:24.7%; background-color: rgba(246, 250, 8, 0.555); padding:  48px   66px;" ></button>
+    <button class="light" id="light53" style ="left: 4.5%; top:42.5%; background-color: rgba(246, 250, 8, 0.555); padding:  83px   55px;" ></button>
+    <button class="light" id="light54" style ="left:66.1%; top:  42%; background-color: rgba(246, 250, 8, 0.555); padding:  89px   66px;" ></button>
+    <button class="light" id="light55" style ="left:57.5%; top:55.5%; background-color: rgba(246, 250, 8, 0.555); padding:  39px   36px;" ></button>
+    <button class="light" id="light56" style ="left:57.5%; top:  50%; background-color: rgba(246, 250, 8, 0.555); padding:15.5px 24.4px;" ></button>
+    <!------------------------------------------------------------------------------------------------------------------------------------------------->
+
+    <!-- 6樓燈 -->
+
+    <button class="light" id="light57" style ="left:32.5%; top:  25%; background-color: rgba(246, 250, 8, 0.555);padding:  53px   65px;" ></button>
+    <button class="light" id="light58" style ="left:  43%; top:  25%; background-color: rgba(246, 250, 8, 0.555);padding:  52px   45px;" ></button>
+    <button class="light" id="light59" style ="left:32.5%; top:  50%; background-color: rgba(246, 250, 8, 0.555);padding:  31px   74px;" ></button>
+    <button class="light" id="light60" style ="left:44.4%; top:49.5%; background-color: rgba(246, 250, 8, 0.555);padding:  33px   36px;" ></button>
+    <button class="light" id="light61" style ="left:15.5%; top:  25%; background-color: rgba(246, 250, 8, 0.555);padding:  51px   65px;" ></button>
+    <button class="light" id="light62" style ="left:   4%; top:  25%; background-color: rgba(246, 250, 8, 0.555);padding:51.5px   72px;" ></button>
+    <button class="light" id="light63" style ="left:56.5%; top:  25%; background-color: rgba(246, 250, 8, 0.555);padding:  51px 63.5px;" ></button>
+    <button class="light" id="light64" style ="left:66.5%; top:  25%; background-color: rgba(246, 250, 8, 0.555);padding:  38px   91px;" ></button>
+    <button class="light" id="light65" style ="left:   4%; top:43.8%; background-color: rgba(246, 250, 8, 0.555);padding:  80px 55.5px;" ></button>
+    <button class="light" id="light66" style ="left:69.5%; top:  38%; background-color: rgba(246, 250, 8, 0.555);padding:  97px   73px;" ></button>
+    <button class="light" id="light67" style ="left:60.5%; top:55.5%; background-color: rgba(246, 250, 8, 0.555);padding:  40px   40px;" ></button>
+    <button class="light" id="light68" style ="left:  13%; top:  55%; background-color: rgba(246, 250, 8, 0.555);padding:  40px   14px;" ></button>
+    <button class="light" id="light69" style ="left:60.5%; top:  50%; background-color: rgba(246, 250, 8, 0.555);padding:  15px   26px;" ></button>
+
+    <!------------------------------------------------------------------------------------------------------------------------------------------------->
+
+
+    <!-- 7樓燈 -->
+
+    <button class="light" id="light70" style ="left:  34%; top:  26%; background-color: rgba(246, 250, 8, 0.555); padding:  52px 60px;" ></button>
+    <button class="light" id="light71" style ="left:43.5%; top:  26%; background-color: rgba(246, 250, 8, 0.555); padding:  52px 20px;" ></button>
+    <button class="light" id="light72" style ="left:46.5%; top:  26%; background-color: rgba(246, 250, 8, 0.555); padding:  52px 20px;" ></button>
+    <button class="light" id="light73" style ="left:  34%; top:  51%; background-color: rgba(246, 250, 8, 0.555); padding:  38px 100px;"></button>
+    <button class="light" id="light74" style ="left:18.5%; top:  26%; background-color: rgba(246, 250, 8, 0.555); padding:  52px 60px;" ></button>
+    <button class="light" id="light75" style ="left:   8%; top:  26%; background-color: rgba(246, 250, 8, 0.555); padding:  52px 66px;" ></button>
+    <button class="light" id="light76" style ="left: 7.5%; top:  52%; background-color: rgba(246, 250, 8, 0.555); padding:  62px 54px;" ></button>
+    <button class="light" id="light77" style ="left:  56%; top:  26%; background-color: rgba(246, 250, 8, 0.555); padding:  52px 56px;" ></button>
+    <button class="light" id="light78" style ="left:  65%; top:  26%; background-color: rgba(246, 250, 8, 0.555); padding:  36px 83px;" ></button>
+    <button class="light" id="light79" style ="left:67.5%; top:  39%; background-color: rgba(246, 250, 8, 0.555); padding: 100px 65px;" ></button>
+    <button class="light" id="light80" style ="left:59.5%; top:  57%; background-color: rgba(246, 250, 8, 0.555); padding:  40px 35px;" ></button>
+    <button class="light" id="light81" style ="left: 9.5%; top:  44%; background-color: rgba(246, 250, 8, 0.555); padding:  24px 42px;" ></button>
+    <button class="light" id="light82" style ="left:59.5%; top:51.5%; background-color: rgba(246, 250, 8, 0.555); padding:  20px 25px;" ></button>
+
+    <!------------------------------------------------------------------------------------------------------------------------------------------------->
+
+    <!-- 8樓燈 -->
+
+    <button class="light" id="light83" style ="left:  33%; top:25.5%; background-color: rgba(246, 250, 8, 0.555); padding:  49px   20px;" ></button>
+    <button class="light" id="light84" style ="left:36.3%; top:25.5%; background-color: rgba(246, 250, 8, 0.555); padding:  49px   20px;" ></button>
+    <button class="light" id="light85" style ="left:39.5%; top:25.5%; background-color: rgba(246, 250, 8, 0.555); padding:  49px   21px;" ></button>
+    <button class="light" id="light86" style ="left:  43%; top:25.5%; background-color: rgba(246, 250, 8, 0.555); padding:  49px   20px;" ></button>
+    <button class="light" id="light87" style ="left:46.3%; top:25.5%; background-color: rgba(246, 250, 8, 0.555); padding:  49px   18px;" ></button>
+    <button class="light" id="light88" style ="left:  33%; top:48.5%; background-color: rgba(246, 250, 8, 0.555); padding:  36px   51px;" ></button>
+    <button class="light" id="light89" style ="left:  41%; top:48.5%; background-color: rgba(246, 250, 8, 0.555); padding:  36px   51px;" ></button>
+    <button class="light" id="light90" style ="left:17.3%; top:25.5%; background-color: rgba(246, 250, 8, 0.555); padding:  48px 61.5px;" ></button>
+    <button class="light" id="light91" style ="left: 6.5%; top:25.5%; background-color: rgba(246, 250, 8, 0.555); padding:47.5px   70px;" ></button>
+    <button class="light" id="light92" style ="left: 6.5%; top:  50%; background-color: rgba(246, 250, 8, 0.555); padding:  59px   52px;" ></button>
+    <button class="light" id="light93" style ="left:  65%; top:25.5%; background-color: rgba(246, 250, 8, 0.555); padding:  35px   83px;" ></button>
+    <button class="light" id="light94" style ="left:55.5%; top:25.5%; background-color: rgba(246, 250, 8, 0.555); padding:  48px 58.5px;" ></button>
+    <button class="light" id="light95" style ="left:67.5%; top:  38%; background-color: rgba(246, 250, 8, 0.555); padding:  92px   69px;" ></button>
+    <button class="light" id="light96" style ="left:  59%; top:54.5%; background-color: rgba(246, 250, 8, 0.555); padding:  36px   38px;" ></button>
+    <button class="light" id="light97" style ="left: 6.5%; top:42.5%; background-color: rgba(246, 250, 8, 0.555); padding:  22px   52px;" ></button>
+    <button class="light" id="light98" style ="left:  59%; top:  49%; background-color: rgba(246, 250, 8, 0.555); padding:  15px 26.5px;" ></button>
+    <!------------------------------------------------------------------------------------------------------------------------------------------------->
+
+    <!-- 9樓燈 -->
+    <button class="light" id="light99"  style ="left:  34%; top:25.5%; background-color: rgba(246, 250, 8, 0.555); padding:   51px   62px;" ></button>
+    <button class="light" id="light100" style ="left:43.5%; top:25.5%; background-color: rgba(246, 250, 8, 0.555); padding:   51px   38px;" ></button>
+    <button class="light" id="light101" style ="left:  34%; top:  50%; background-color: rgba(246, 250, 8, 0.555); padding:   38px   31px;" ></button>
+    <button class="light" id="light102" style ="left:  39%; top:  50%; background-color: rgba(246, 250, 8, 0.555); padding:   38px   35px;" ></button>
+    <button class="light" id="light103" style ="left:44.5%; top:  50%; background-color: rgba(246, 250, 8, 0.555); padding:   38px   31px;" ></button>
+    <button class="light" id="light104" style ="left:  64%; top:25.5%; background-color: rgba(246, 250, 8, 0.555); padding:   38px   80px;"></button>
+    <button class="light" id="light105" style ="left:18.3%; top:25.5%; background-color: rgba(246, 250, 8, 0.555); padding:   51px   66px;"></button>
+    <button class="light" id="light106" style ="left: 9.3%; top:25.5%; background-color: rgba(246, 250, 8, 0.555); padding:   65px   57px;" ></button>
+    <button class="light" id="light107" style ="left: 9.1%; top:  49%; background-color: rgba(246, 250, 8, 0.555); padding:   66px   50px;" ></button>
+    <button class="light" id="light108" style ="left:55.4%; top:25.5%; background-color: rgba(246, 250, 8, 0.555); padding:   51px   57px;"></button>
+    <button class="light" id="light109" style ="left:66.7%; top:38.6%; background-color: rgba(246, 250, 8, 0.555); padding:  100px   62px;" ></button>
+    <button class="light" id="light110" style ="left:58.8%; top:56.3%; background-color: rgba(246, 250, 8, 0.555); padding:   38px   35px;" ></button>
+    <button class="light" id="light112" style ="left:  17%; top:  55%; background-color: rgba(246, 250, 8, 0.555); padding:   38px   15px;" ></button>
+    <button class="light" id="light113" style ="left:58.8%; top:50.7%; background-color: rgba(246, 250, 8, 0.555); padding:   15px   25px;"></button>
+   <!------------------------------------------------------------------------------------------------------------------------------------------------->
+
+
+
+
+
+
+    
+</div>
+
+  
+  <div id="floorContainer">
+    <img class="floor-plan" id="floor1" src="https://github.com/benson1117/project/blob/main/b5dc9d2b-37b6-4cee-971a-7e0b063fd150.jpg?raw=true" alt="1樓平面圖">
+    <img class="floor-plan" id="floor2" src="https://github.com/benson1117/project/blob/main/550ee6bb-e65b-4560-8917-ebb1d2d630a1.jpg?raw=true" alt="2樓平面圖">
+    <img class="floor-plan" id="floor3" src="https://github.com/benson1117/project/blob/main/d4803b84-97c5-47d1-9c41-d97e54b9fb7e.jpg?raw=true" alt="3樓平面圖">
+    <img class="floor-plan" id="floor4" src="https://github.com/benson1117/project/blob/main/f23e7ae2-780d-48bf-ba09-3dc6e0a5fa5c.jpg?raw=true" alt="4樓平面圖">
+    <img class="floor-plan" id="floor5" src="https://github.com/benson1117/project/blob/main/5-Photoroom.png?raw=true" alt="5樓平面圖">
+    <img class="floor-plan" id="floor6" src="https://github.com/benson1117/project/blob/main/6-Photoroom.png?raw=true" alt="6樓平面圖">
+    <img class="floor-plan" id="floor7" src="https://github.com/benson1117/project/blob/main/3706192a-3915-4646-92c8-1f8ccad923ee.jpg?raw=true" alt="7樓平面圖">
+    <img class="floor-plan" id="floor8" src="https://github.com/benson1117/project/blob/main/f65f5027-d04c-466a-a58d-b1de14be65fd.jpg?raw=true" alt="8樓平面圖">
+    <img class="floor-plan" id="floor9" src="https://github.com/benson1117/project/blob/main/c6ac0406-4272-4c4f-837a-3240fdc76dc2.jpg?raw=true" alt="9樓平面圖">
+    <span class="s">
+      <div id="toilet1" style="left: 10%; top:12%;" ></div>
+      <div id="toilet2" style="right: 9.8%; top:17%;"></div>
+      <div id="toilet3" style="left: 10%; top:12%;"></div>
+      <div id="toilet4" style="right: 14.5%; top:17%;"></div>
+      <div id="toilet5" style="right: 9.8%; top:17%;"></div>
+      <div id="toilet6" style="left: 10%; top:12%;"></div>
+      <div id="toilet7" style="right: 14.5%; top:17%;"></div>
+      <div id="toilet8" style="right: 9.8%; top:17%;"></div>
+      <div id="toilet9" style="left:10%; top:12%;"></div>
+      <div id="toilet10" style="right: 14%; top:17%;"></div>
+      <div id="toilet11" style="right: 9.3%; top:17%;"></div>
+      <div id="toilet12" style="left: 10%; top:12%;"></div>
+      <div id="toilet13" style="right: 14.5%; top:17%;"></div>
+      <div id="toilet14" style="right: 9.8%; top:17%;"></div>
+      <div id="toilet15" style="left: 10.5%; top:12%;"></div>
+
+      
+      
+
+      <div id="floors1" ></div>
+      <div id="floors2" ></div>
+      <div id="floors3" ></div>
+      <div id="floors4" ></div>
+      <div id="floors5" ></div>
+      <div id="floors6" ></div>
+      <div id="floors7" ></div>
+      <div id="floors8" ></div>
+      <div id="floors9" ></div>
+    </span>
+  </div>
+  <div class="exclamationcontainer">
+      <div id="exclamation9">9</div>
+      <div id="exclamation8">8</div>
+      <div id="exclamation7">7</div>
+      <div id="exclamation6">6</div>
+      <div id="exclamation5">5</div>
+      <div id="exclamation4">4</div>
+      <div id="exclamation3">3</div>
+      <div id="exclamation2">2</div>
+      <div id="exclamation1">1</div>
+
+  </div>
+
+  <div class="doorcontainer">
+    <!-- 一樓教室 -->
+    <button class="door" id="door0" style ="left: 19%; top:27%;" ></button> 
+    <button class="door" id="door1" style ="left: 19%; top:38.6%;" ></button>
+    <button class="door" id="door2" style ="left: 15.5%; top:27%;" ></button>
+    <button class="door" id="door3" style ="left: 15.5%; top:38.6%;" ></button>
+    <button class="door" id="door4" style ="left: 15.5%; top:50%;" ></button>
+    <button class="door" id="door5" style ="left: 15.5%; top:65.5%;" ></button>
+    <button class="door" id="door6" style ="left: 63.5%; top:27%;" ></button>
+    <button class="door" id="door7" style ="left: 63.5%; top:38.6%;" ></button>
+    <button class="door" id="door8" style ="left: 67%; top:27%;" ></button>
+    <button class="door" id="door9" style ="left: 67%; top:38.6%; " ></button>
+    <button class="door" id="door10" style ="left: 67%; top:50%; " ></button>
+    <button class="door" id="door11" style ="left: 67%; top:65.5%; " ></button>
+    <button class="door" id="door12" style ="left: 21.3%; top:49.5%;padding: 5px 10px; " ></button>
+    <!-- 一樓大門 -->
+    <button class="door" id="door13" style ="left: 51.2%; top:25%;padding: 5px 10px;" ></button>
+    <button class="door" id="door14" style ="left: 38%; top:65.6%;padding: 5px 10px; " ></button>
+    <button class="door" id="door15" style ="left: 43.4%; top:65.5%;padding: 5px 10px; " ></button>
+    <button class="door" id="door16" style ="left: 54%; top:44.8%; " ></button>
+    <button class="door" id="door17" style ="left: 28%; top:44.8%; " ></button>
+    <button class="door" id="door18" style ="left: 75%; top:45%; " ></button>
+    <button class="door" id="door19" style ="left: 9%; top:45%; " ></button>
+    <button class="door" id="door20" style ="left: 24.3%; top:49.5%;padding: 5px 10px; " ></button>
+    <button class="door" id="door21" style ="left: 57.5%; top:49.5%;padding: 5px 10px; " ></button>
+
+<!----------------------------------------------------------------------------------------->
+    <!-- 二樓教室 -->
+    <button class="door" id="door22" style ="left: 19%; top:26%;" ></button>
+    <button class="door" id="door23" style ="left: 19%; top:38.6%;" ></button>
+    <button class="door" id="door24" style ="left: 16%; top:26%;;" ></button>
+    <button class="door" id="door25" style ="left: 16%; top:38.6%;;" ></button>
+    <button class="door" id="door26" style ="left: 16%; top:50%;" ></button> 
+    <button class="door" id="door27" style ="left: 16%; top:64%;" ></button>
+    <button class="door" id="door28" style ="left: 65.5%; top:27%;" ></button>
+    <button class="door" id="door29" style ="left: 65.5%; top:38.6%;" ></button>
+    <button class="door" id="door30" style ="left: 69%; top:27%;" ></button>
+    <button class="door" id="door31" style ="left: 69%; top:38.6%; " ></button>
+    <button class="door" id="door32" style ="left: 69%; top:44.5%; " ></button>
+    <button class="door" id="door33" style ="left: 69%; top:66.5%; " ></button>
+    <button class="door" id="door34" style ="left: 16%; top:43%;" ></button>
+    <button class="door" id="door35" style ="left: 22%; top:49.5%;padding: 5px 10px; " ></button>
+    <!-- 二樓門 -->
+    <button class="door" id="door36" style ="left: 9%; top:45%;" ></button>
+    <button class="door" id="door37" style ="left: 17.2%; top:24.2%;padding: 5px 10px;" ></button>
+    <button class="door" id="door38" style ="left: 16.8%; top:67%;padding: 5px 10px;" ></button>
+    <button class="door" id="door39" style ="left: 25%; top:49.5%;padding: 5px 10px; " ></button>
+    <button class="door" id="door40" style ="left: 29.2%; top:44.5%; " ></button>
+    <button class="door" id="door41" style ="left: 34%; top:61%;padding: 5px 10px;" ></button>
+    <button class="door" id="door42" style ="left: 49.3%; top:61%;padding: 5px 10px;" ></button>
+    <button class="door" id="door43" style ="left: 56%; top:44.7%;" ></button>
+    <button class="door" id="door44" style ="left: 59%; top:49.5%;padding: 5px 10px;" ></button>
+    <button class="door" id="door45" style ="left: 66.8%; top:24.2%;padding: 5px 10px; " ></button>
+    <button class="door" id="door46" style ="left: 66.8%; top:69.2%;padding: 5px 10px; " ></button>
+
+
+<!-- ----------------------------------------------------------------------------------- -->
+    <!-- 三樓教室 -->
+    <button class="door" id="door47" style ="left: 38%; top:52%;padding: 5px 10px;" ></button>
+    <button class="door" id="door48" style ="left: 47.5%; top:52%;padding: 5px 10px;" ></button>
+    <button class="door" id="door49" style ="left: 36%; top:52%;padding: 5px 10px; " ></button>
+    <button class="door" id="door50" style ="left: 35%; top:45%;padding: 5px 10px;" ></button>
+    <button class="door" id="door51" style ="left: 47%; top:45%;padding: 5px 10px; " ></button>
+    <button class="door" id="door52" style ="left: 43%; top:45%;padding: 5px 10px; " ></button>
+    <button class="door" id="door53" style ="left: 16.6%; top:27%;" ></button>
+    <button class="door" id="door54" style ="left: 16.6%; top:40%;" ></button>
+    <button class="door" id="door55" style ="left: 13%; top:27%;;" ></button>
+    <button class="door" id="door56" style ="left: 13%; top:40%;;" ></button>
+    <button class="door" id="door57" style ="left: 13%; top:52.7%;" ></button>
+    <button class="door" id="door58" style ="left: 13%; top:67.8%;" ></button>  
+    <button class="door" id="door59" style ="left: 64.5%; top:27%;" ></button>
+    <button class="door" id="door60" style ="left: 64.5%; top:40%;" ></button>
+    <button class="door" id="door61" style ="left: 67.5%; top:28%;padding: 15px 5px;" ></button>
+    <button class="door" id="door62" style ="left: 67.5%; top:46%;padding: 15px 5px;" ></button>
+    <button class="door" id="door63" style ="left: 67.5%; top:66.1%;padding: 15px 5px;" ></button>
+    <button class="door" id="door64" style ="left: 13%; top:46%;" ></button>
+    <button class="door" id="door65" style ="left: 31%; top:43%;padding: 5px 10px;" ></button>
+    <button class="door" id="door66" style ="left: 49%; top:52%;padding: 5px 10px;" ></button>
+    <button class="door" id="door67" style ="left: 48.7%; top:43%;padding: 5px 10px;" ></button>
+    <!-- 三樓門 -->
+    <button class="door" id="door68" style ="left: 6%; top:47.4%;padding: 15px 5px;" ></button>
+    <button class="door" id="door69" style ="left: 14.3%; top:25.8%;padding: 5px 10px;" ></button>
+    <button class="door" id="door70" style ="left: 14.2%; top:70.3%;padding: 5px 10px; " ></button>
+    <button class="door" id="door71" style ="left: 22.5%; top:52%;padding: 5px 10px;" ></button>
+    <button class="door" id="door72" style ="left: 31%; top:52%;padding: 5px 10px; " ></button>
+    <button class="door" id="door73" style ="left: 57.7%; top:52%;padding: 5px 10px; " ></button>
+    <button class="door" id="door74" style ="left: 62%; top:52%;padding: 5px 10px; " ></button>
+    <button class="door" id="door75" style ="left: 65.4%; top:25%;padding: 5px 10px;" ></button>
+    <button class="door" id="door76" style ="left: 65.6%; top:70%;padding: 5px 10px;" ></button>
+<!-- --------------------------------------------------------------------------------------------------------- -->
+    <!-- 四樓教室 -->
+    <button class="door" id="door77" style ="left: 34.6%; top:43%;padding: 5px 10px;" ></button> 
+    <button class="door" id="door78" style ="left: 42.7%; top:43%;padding: 5px 10px;" ></button>
+    <button class="door" id="door79" style ="left: 44%; top:43%;padding: 5px 10px;" ></button>
+    <button class="door" id="door80" style ="left: 47.6%; top:43%;padding: 5px 10px;" ></button>
+    <button class="door" id="door81" style ="left: 38%; top:50%;padding: 5px 10px;" ></button>
+    <button class="door" id="door82" style ="left: 44%; top:50%;padding: 5px 10px;" ></button>
+    <button class="door" id="door83" style ="left: 49%; top:50%;padding: 5px 10px;" ></button>
+    <button class="door" id="door84" style ="left: 26%; top:43%;padding: 5px 10px;" ></button>
+    <button class="door" id="door85" style ="left: 18.2%; top:43%;padding: 5px 10px;" ></button>
+    <button class="door" id="door86" style ="left: 15.8%; top:43%;padding: 5px 10px; " ></button>
+    <button class="door" id="door87" style ="left: 15.8%; top:26.4%;padding: 5px 10px; " ></button>
+    <button class="door" id="door88" style ="left: 14.4%; top:50.2%; " ></button>
+    <button class="door" id="door89" style ="left: 14.4%; top:64.2%; " ></button>
+    <button class="door" id="door90" style ="left: 66%; top:30%; " ></button>
+    <button class="door" id="door91" style ="left: 66%; top:40%;" ></button>
+    <button class="door" id="door92" style ="left: 69.5%; top:30%; padding: 15px 5px;" ></button>
+    <button class="door" id="door93" style ="left: 69.5%; top:50%; padding: 15px 5px;" ></button>
+    <button class="door" id="door94" style ="left: 69.5%; top:63%; padding: 15px 5px;" ></button>
+    <button class="door" id="door95" style ="left: 66%; top:53%; padding: 5px 10px;" ></button>
+    <button class="door" id="door96" style ="left:14.4%;top:44%; " ></button>
+    <button class="door" id="door97" style ="left: 7.6%; top:45.2%;padding: 15px 5px; " ></button>
+    <!-- 四樓門 -->
+    <button class="door" id="door98" style ="left:15.5%; top:67%;padding: 5px 10px;" ></button> 
+    <button class="door" id="door99" style ="left: 24%; top:50%;padding: 5px 10px;" ></button>
+    <button class="door" id="door100" style ="left: 59.2%; top:50%;padding: 5px 10px;" ></button>
+    <button class="door" id="door101" style ="left: 64%; top:50%;padding: 5px 10px;" ></button>
+    <button class="door" id="door102" style ="left: 67.3%; top:27%;padding: 5px 10px;" ></button>
+    <button class="door" id="door103" style ="left: 67.5%; top:67.5%;padding: 5px 10px;" ></button>
+  <!-- ------------------------------------------------------------------------------------------------ -->
+    <!-- 五樓教室 -->
+    <button class="door" id="door104" style ="left: 32%; top:42.1%;padding: 5px 10px;" ></button> 
+    <button class="door" id="door105" style ="left: 39.7%; top:42.1%;padding: 5px 10px;" ></button>
+    <button class="door" id="door106" style ="left: 41%; top:42.1%;padding: 5px 10px;" ></button>
+    <button class="door" id="door107" style ="left: 44%; top:42.1%;padding: 5px 10px;" ></button>
+    <button class="door" id="door108" style ="left: 35%; top:49%;padding: 5px 10px;" ></button>
+    <button class="door" id="door109" style ="left: 41%; top:49%;padding: 5px 10px;" ></button>
+    <button class="door" id="door110" style ="left: 46%; top:49%;padding: 5px 10px;" ></button>
+    <button class="door" id="door111" style ="left: 22.7%; top:42.1%;padding: 5px 15px;" ></button>
+    <button class="door" id="door112" style ="left: 13%; top:42.1%;padding: 5px 15px;" ></button>
+    <button class="door" id="door113" style ="left: 13.4%; top:23.3%;padding: 5px 15px; " ></button>
+    <button class="door" id="door114" style ="left: 62.5%; top:26.5%; " ></button>
+    <button class="door" id="door115" style ="left: 62.5%; top:38%; " ></button>
+    <button class="door" id="door116" style ="left: 66%; top:26.5%; " ></button>
+    <button class="door" id="door117" style ="left: 66%; top:38%;" ></button>
+    <button class="door" id="door118" style ="left: 12.5%; top:42.3%;" ></button>
+    <button class="door" id="door119" style ="left: 12.5%; top:65.5%; " ></button>
+    <button class="door" id="door120" style ="left: 66%; top:43.9%;padding: 15px 5px; " ></button>
+    <button class="door" id="door121" style ="left: 66%; top:64.4%;padding: 15px 5px; " ></button>
+    <button class="door" id="door122" style ="left: 62%; top:52%;padding: 5px 10px; " ></button>
+    <button class="door" id="door123" style ="left: 60%; top:50%;padding: 5px 10px; " ></button>
+    <!-- 五樓門 -->
+    <button class="door" id="door124" style ="left: 13%; top:67.4%;padding: 5px 15px;" ></button> 
+    <button class="door" id="door125" style ="left: 21.5%; top:48.5%;padding: 5px 10px;" ></button>
+    <button class="door" id="door126" style ="left: 55.9%; top:48.5%;padding: 5px 10px;" ></button>
+    <button class="door" id="door127" style ="left: 63.2%; top:25%;padding: 5px 15px;" ></button>
+    <button class="door" id="door128" style ="left: 63.5%; top:68.4%;padding: 5px 15px;" ></button>
+  <!-- -------------------------------------------------------------------------------------------- -->
+    <!-- 六樓教室 -->
+    <button class="door" id="door129" style ="left: 33%; top:42%;padding: 5px 10px;" ></button> 
+    <button class="door" id="door130" style ="left: 41.3%; top:42%;padding: 5px 10px;" ></button>
+    <button class="door" id="door131" style ="left: 47.5%; top:42%;padding: 5px 10px;" ></button>
+    <button class="door" id="door132" style ="left: 32%; top:50%;padding: 5px 10px;" ></button>
+    <button class="door" id="door133" style ="left: 43%; top:50%;padding: 5px 10px;" ></button>
+    <button class="door" id="door134" style ="left: 48.5%; top:50%;padding: 5px 10px;" ></button>
+    <button class="door" id="door135" style ="left: 23.3%; top:42%;padding: 5px 15px;" ></button>
+    <button class="door" id="door136" style ="left: 12.8%; top:42%;padding: 5px 15px;" ></button>
+    <button class="door" id="door137" style ="left: 12.8%; top:24.7%;padding: 5px 15px; " ></button>
+    <button class="door" id="door138" style ="left: 63.5%; top:42%;padding: 5px 15px;" ></button>
+    <button class="door" id="door139" style ="left: 66.6%; top:36.5%;padding: 5px 15px;" ></button>
+    <button class="door" id="door140" style ="left: 12%; top:43%; " ></button>
+    <button class="door" id="door141" style ="left: 12%; top:65.5%; " ></button>
+    <button class="door" id="door142" style ="left: 69.7%; top:43.5%;padding: 15px 5px; " ></button>
+    <button class="door" id="door143" style ="left: 69.7%; top:63.7%;padding: 15px 5px; " ></button>
+    <button class="door" id="door144" style ="left: 65.5%; top:52%;padding: 5px 10px;" ></button>
+    <button class="door" id="door145" style ="left: 14%; top:54.5%;padding: 5px 10px; " ></button>
+    <button class="door" id="door146" style ="left: 63.5%; top:50%;padding: 5px 10px; " ></button>
+    <!-- 六樓門 -->
+    <button class="door" id="door147" style ="left: 12.8%; top:67.8%;padding: 5px 15px;" ></button> 
+    <button class="door" id="door148" style ="left: 22%; top:50%;padding: 5px 10px;" ></button>
+    <button class="door" id="door149" style ="left: 59%; top:50%;padding: 5px 10px;" ></button>
+    <button class="door" id="door150" style ="left: 67%; top:25%;padding: 5px 15px;" ></button>
+    <button class="door" id="door151" style ="left: 67%; top:69%;padding: 5px 15px;" ></button>
+  <!-- ------------------------------------------------------------------------------------------------ -->
+    <!-- 七樓教室 -->
+    <button class="door" id="door152" style ="left: 34.5%; top:43.5%;padding: 5px 10px;" ></button> 
+    <button class="door" id="door153" style ="left: 42%; top:43.5%;padding: 5px 10px;" ></button>
+    <button class="door" id="door154" style ="left: 43.5%; top:43.5%;padding: 5px 10px;" ></button>
+    <button class="door" id="door155" style ="left: 46.5%; top:43.5%;padding: 5px 10px;" ></button>
+    <button class="door" id="door156" style ="left: 34%; top:50.5%;padding: 5px 10px;" ></button>
+    <button class="door" id="door157" style ="left: 48.5%; top:50.5%;padding: 5px 10px;" ></button>
+    <button class="door" id="door158" style ="left: 25.5%; top:43.5%;padding: 5px 15px;" ></button>
+    <button class="door" id="door159" style ="left: 16%;  top:43.5%;padding: 5px 15px;" ></button>
+    <button class="door" id="door160" style ="left: 16%; top:25%;padding: 5px 15px;" ></button>
+    <button class="door" id="door161" style ="left: 15.5%; top:52%; " ></button>
+    <button class="door" id="door162" style ="left: 15.5%; top:68%; " ></button>
+    <button class="door" id="door163" style ="left: 61.8%; top:43.5%;padding: 5px 15px; " ></button>
+    <button class="door" id="door164" style ="left: 64.9%; top:38%;padding: 5px 15px; " ></button>
+    <button class="door" id="door165" style ="left: 67.5%; top:44.7%;padding: 15px 5px;" ></button>
+    <button class="door" id="door166" style ="left: 67.5%; top:65.5%;padding: 15px 5px; " ></button>
+    <button class="door" id="door167" style ="left: 64%; top:53%;padding: 5px 10px; " ></button>
+    <button class="door" id="door168" style ="left: 15.5%; top:44%; " ></button>
+    <button class="door" id="door169" style ="left: 62%; top:51%;padding: 5px 10px;  " ></button>
+    <!-- 七樓門 -->
+    <button class="door" id="door170" style ="left: 9%; top:45.5%;;padding: 15px 5px;" ></button> 
+    <button class="door" id="door171" style ="left: 16%;  top:70%;padding: 5px 15px;" ></button>
+    <button class="door" id="door172" style ="left: 24.5%; top:50.5%;padding: 5px 10px;" ></button>
+    <button class="door" id="door173" style ="left:57.5%; top:50.5%;padding: 5px 10px;" ></button>    
+    <button class="door" id="door174" style ="left: 64.9%; top:25%;padding: 5px 15px;" ></button>
+    <button class="door" id="door175" style ="left: 65%; top:70%;padding: 5px 15px;" ></button>
+  <!-- ---------------------------------------------------------------------------------------------- -->
+    <!-- 八樓教室 -->
+    <button class="door" id="door176" style ="left: 33.5%; top:41.5%;padding: 5px 10px;" ></button> 
+    <button class="door" id="door177" style ="left: 36%; top:41.5%;padding: 5px 10px;" ></button>
+    <button class="door" id="door178" style ="left: 39.5%; top:41.5%;padding: 5px 10px;" ></button>
+    <button class="door" id="door179" style ="left: 43%; top:41.5%;padding: 5px 10px;" ></button>
+    <button class="door" id="door180" style ="left: 46%; top:41.5%;padding: 5px 10px;" ></button>
+    <button class="door" id="door181" style ="left: 33%; top:48.5%;padding: 5px 10px;" ></button>
+    <button class="door" id="door182" style ="left: 48%; top:48.5%;padding: 5px 10px;" ></button>
+    <button class="door" id="door183" style ="left: 24.5%; top:41.5%;padding: 5px 15px;" ></button>
+    <button class="door" id="door184" style ="left: 14.7%; top:41.5%;padding: 5px 15px;" ></button>
+    <button class="door" id="door185" style ="left: 14.7%; top:24.5%;padding: 5px 15px; " ></button>
+    <button class="door" id="door186" style ="left: 14%; top:49.5%; " ></button>
+    <button class="door" id="door187" style ="left: 14%; top:63.4%; " ></button>
+    <button class="door" id="door188" style ="left: 64.7%; top:36%;padding: 5px 15px; " ></button>
+    <button class="door" id="door189" style ="left: 61.8%; top:42%;padding: 5px 15px;" ></button>
+    <button class="door" id="door190" style ="left: 67.5%; top:42.5%;padding: 15px 5px; " ></button>
+    <button class="door" id="door191" style ="left: 67.5%; top:62%;padding: 15px 5px;" ></button>
+    <button class="door" id="door192" style ="left: 64%; top:51%;padding: 5px 10px; " ></button>
+    <button class="door" id="door193" style ="left: 14%; top:42.5%; " ></button>
+    <button class="door" id="door194" style ="left: 62%; top:49%;padding: 5px 10px; " ></button>
+    <!-- 八樓門 -->
+    <button class="door" id="door195" style ="left: 7.5%; top:43.5%; padding: 15px 5px;" ></button> 
+    <button class="door" id="door196" style ="left: 14.8%; top:66.5%;padding: 5px 15px;" ></button>
+    <button class="door" id="door197" style ="left: 23%; top:48.5%;padding: 5px 10px;" ></button>
+    <button class="door" id="door198" style ="left: 57.5%; top:49%;padding: 5px 10px;" ></button>
+    <button class="door" id="door199" style ="left: 65%; top:25%;padding: 5px 15px;" ></button>
+    <button class="door" id="door200" style ="left: 65%; top:67%;padding: 5px 15px;" ></button>
+  <!-- ---------------------------------------------------------------------------------------------- -->
+    <!-- 九樓教室 -->
+    <button class="door" id="door201" style ="left: 34.5%; top:42%;padding: 5px 10px;" ></button> 
+    <button class="door" id="door202" style ="left: 42%; top:42%;padding: 5px 10px;" ></button>
+    <button class="door" id="door203" style ="left: 47.5%; top:42%;padding: 5px 10px;" ></button>
+    <button class="door" id="door204" style ="left: 37.5%; top:49%;padding: 5px 10px;" ></button>
+    <button class="door" id="door205" style ="left: 38.5%; top:49%;padding: 5px 10px;" ></button>
+    <button class="door" id="door206" style ="left: 48%; top:49%;padding: 5px 10px;" ></button>
+    <button class="door" id="door207" style ="left: 64%; top:37%;padding: 5px 15px;" ></button>
+    <button class="door" id="door208" style ="left: 26%; top:42%;padding: 5px 15px;" ></button>
+    <button class="door" id="door209" style ="left: 17.5%; top:43.5%;padding: 15px 5px;" ></button>
+    <button class="door" id="door210" style ="left: 17.5%; top:49%;padding: 15px 5px;" ></button>
+    <button class="door" id="door211" style ="left: 16.5%; top:65.5%; " ></button>
+    <button class="door" id="door212" style ="left: 55%; top:42%;padding: 5px 10px; " ></button>
+    <button class="door" id="door213" style ="left: 62%; top:42%;padding: 5px 10px; " ></button>
+    <button class="door" id="door214" style ="left: 66.5%; top:44.5%;padding: 15px 5px;" ></button>
+    <button class="door" id="door215" style ="left: 66.5%; top:64.5%;padding: 15px 5px; " ></button>
+    <button class="door" id="door216" style ="left: 63%; top:52%;padding: 5px 10px; " ></button>
+    <button class="door" id="door217" style ="left: 18%; top:55%;padding: 5px 10px; " ></button>
+    <button class="door" id="door218" style ="left: 61%; top:50%;padding: 5px 10px; " ></button>
+    <!-- 九樓門 -->
+    <button class="door" id="door219" style ="left: 18%; top:24%;padding: 5px 15px;" ></button> 
+    <button class="door" id="door220" style ="left: 17%; top:68%;padding: 5px 15px;" ></button>
+    <button class="door" id="door221" style ="left: 25%; top:49%;padding: 5px 10px;" ></button>
+    <button class="door" id="door222" style ="left: 57%; top:50%;padding: 5px 10px;" ></button>
+    <button class="door" id="door223" style ="left: 64%; top:25%;padding: 5px 15px;" ></button>
+    <button class="door" id="door224" style ="left: 64%; top:69%;padding: 5px 15px;" ></button>
+    
+
+</div>
+
+  <div id="trashContainer">
+      <img class="trash" id="trashcan0" src="https://github.com/benson1117/project/blob/main/%E2%80%94Pngtree%E2%80%94cartoon%20trash%20can%20icon%20design_4621435.png?raw=true" style="right:   47%; top:56.5%;">
+      <img class="trash" id="trashcan1" src="https://github.com/benson1117/project/blob/main/%E2%80%94Pngtree%E2%80%94cartoon%20trash%20can%20icon%20design_4621435.png?raw=true" style="right: 67.5%; top:  28%;">
+      <img class="trash" id="trashcan2" src="https://github.com/benson1117/project/blob/main/%E2%80%94Pngtree%E2%80%94cartoon%20trash%20can%20icon%20design_4621435.png?raw=true" style="right: 71.2%; top:44.8%;">
+      <img class="trash" id="trashcan3" src="https://github.com/benson1117/project/blob/main/%E2%80%94Pngtree%E2%80%94cartoon%20trash%20can%20icon%20design_4621435.png?raw=true" style="right:   73%; top:47.2%;">
+      <img class="trash" id="trashcan4" src="https://github.com/benson1117/project/blob/main/%E2%80%94Pngtree%E2%80%94cartoon%20trash%20can%20icon%20design_4621435.png?raw=true" style="right: 71.5%; top:45.3%;">
+      <img class="trash" id="trashcan5" src="https://github.com/benson1117/project/blob/main/%E2%80%94Pngtree%E2%80%94cartoon%20trash%20can%20icon%20design_4621435.png?raw=true" style="right: 73.5%; top:44.2%;">
+      <img class="trash" id="trashcan6" src="https://github.com/benson1117/project/blob/main/%E2%80%94Pngtree%E2%80%94cartoon%20trash%20can%20icon%20design_4621435.png?raw=true" style="right: 42.2%; top:  45%;">
+      <img class="trash" id="trashcan7" src="https://github.com/benson1117/project/blob/main/%E2%80%94Pngtree%E2%80%94cartoon%20trash%20can%20icon%20design_4621435.png?raw=true" style="right:   71%; top:45.8%;">
+      <img class="trash" id="trashcan8" src="https://github.com/benson1117/project/blob/main/%E2%80%94Pngtree%E2%80%94cartoon%20trash%20can%20icon%20design_4621435.png?raw=true" style="right:   72%; top:  44%;">
+      <img class="trash" id="trashcan9" src="https://github.com/benson1117/project/blob/main/%E2%80%94Pngtree%E2%80%94cartoon%20trash%20can%20icon%20design_4621435.png?raw=true" style="right:   71%; top:44.8%;">
+      <img class="trash2" id="trashcan10" src="https://github.com/benson1117/project/blob/main/%E2%80%94Pngtree%E2%80%94the%20trash%20can%20icon%20is_15430950.png?raw=true" style="right:   47%; top:54.2%;">
+      <img class="trash2" id="trashcan11" src="https://github.com/benson1117/project/blob/main/%E2%80%94Pngtree%E2%80%94the%20trash%20can%20icon%20is_15430950.png?raw=true" style="right:   66%; top:25.7%;">
+      <img class="trash2" id="trashcan12" src="https://github.com/benson1117/project/blob/main/%E2%80%94Pngtree%E2%80%94the%20trash%20can%20icon%20is_15430950.png?raw=true" style="right: 69.7%; top:42.5%;">
+      <img class="trash2" id="trashcan13" src="https://github.com/benson1117/project/blob/main/%E2%80%94Pngtree%E2%80%94the%20trash%20can%20icon%20is_15430950.png?raw=true" style="right: 71.5%; top:44.9%;">
+      <img class="trash2" id="trashcan14" src="https://github.com/benson1117/project/blob/main/%E2%80%94Pngtree%E2%80%94the%20trash%20can%20icon%20is_15430950.png?raw=true" style="right:   70%; top:  43%;">
+      <img class="trash2" id="trashcan15" src="https://github.com/benson1117/project/blob/main/%E2%80%94Pngtree%E2%80%94the%20trash%20can%20icon%20is_15430950.png?raw=true" style="right:   73%; top:41.9%;">
+      <img class="trash2" id="trashcan16" src="https://github.com/benson1117/project/blob/main/%E2%80%94Pngtree%E2%80%94the%20trash%20can%20icon%20is_15430950.png?raw=true" style="right:   42%; top:42.7%;">
+      <img class="trash2" id="trashcan17" src="https://github.com/benson1117/project/blob/main/%E2%80%94Pngtree%E2%80%94the%20trash%20can%20icon%20is_15430950.png?raw=true" style="right:   70%; top:43.5%;">
+      <img class="trash2" id="trashcan18" src="https://github.com/benson1117/project/blob/main/%E2%80%94Pngtree%E2%80%94the%20trash%20can%20icon%20is_15430950.png?raw=true" style="right: 70.5%; top:41.7%;">
+      <img class="trash2" id="trashcan19" src="https://github.com/benson1117/project/blob/main/%E2%80%94Pngtree%E2%80%94the%20trash%20can%20icon%20is_15430950.png?raw=true" style="right: 69.5%; top:42.5%;">
+      <img class="trash2" id="snow0" src="https://github.com/benson1117/project/blob/main/Lovepik_com-401441717-snowflake-icon.png?raw=true" style="right:   22%; top:25%;">
+      <img class="trash2" id="snow1" src="https://github.com/benson1117/project/blob/main/Lovepik_com-401441717-snowflake-icon.png?raw=true" style="right: 34.5%; top:  25%;">
+      <img class="trash2" id="snow2" src="https://github.com/benson1117/project/blob/main/Lovepik_com-401441717-snowflake-icon.png?raw=true" style="right: 87.5%; top:44%;">
+      <img class="trash2" id="snow3" src="https://github.com/benson1117/project/blob/main/Lovepik_com-401441717-snowflake-icon.png?raw=true" style="right:   78.5%; top:25%;">
+      <img class="trash2" id="snow4" src="https://github.com/benson1117/project/blob/main/Lovepik_com-401441717-snowflake-icon.png?raw=true" style="right: 62%; top:56.1%;"></div>
+
+  <div id="floorSelector">
+    <button data-floor="1">1樓</button>
+    <button data-floor="2">2樓</button>
+    <button data-floor="3">3樓</button>
+    <button data-floor="4">4樓</button>
+    <button data-floor="5">5樓</button>
+    <button data-floor="6">6樓</button>
+    <button data-floor="7">7樓</button>
+    <button data-floor="8">8樓</button>
+    <button data-floor="9">9樓</button>
+  </div>
+  <script>
+    
+  </script>
+</body>
+</html>

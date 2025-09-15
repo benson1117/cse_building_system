@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <style>
+
+        .button2 {
+            position: absolute;
+            padding: 13px 13px;
+            border: none;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+        .button3 {
+            position: absolute;
+            padding: 4px 4px;
+            border: none;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+        #teacher1,
+        #teacher2,
+        #teacher3,
+        #teacher4,
+        #teacher5,
+        #teacher6,
+        #teacher7,
+        #teacher8,
+        #teacher9,
+        #teacher10,
+        #teacher11,
+        #teacher12,
+        #teacher13,
+        #teacher14,
+        #teacher15,
+        #teacher16,
+        #teacher17,
+        #teacher18,
+        #teacher19,
+        #teacher20,
+        #teacher21,
+        #teacher22,
+        #teacher23,
+        #teacher24,
+        #teacher25,
+        #teacher26,
+        #teacher27,
+        #teacher28,
+        #teacher29,
+        #teacher30,
+        #teacher31,
+        #teacher32,  
+        #teacher33,
+        #teacher34,
+        #teacher35,
+        #teacher36 {
+                    position: absolute;
+        }
+        #button1,
+        #button2,
+        #button3,
+        #button4,
+        #button5,
+        #button6,
+        #button7,
+        #button8,
+        #button9,
+        #button10,
+        #button11,
+        #button12,
+        #button13,
+        #button14,
+        #button15,
+        #button16,
+        #button17,
+        #button18,
+        #button19,
+        #button20,
+        #button21,
+        #button22,
+        #button23,
+        #button24,
+        #button25,
+        #button26,
+        #button27,
+        #button28,
+        #button29,
+        #button30,
+        #button31,
+        #button32, 
+        #button33,
+        #button34,
+        #button35,
+        #button36  {
+            position: absolute;
+        }
+    </style> 
+    <script>
+    
+    async function updateTeacherValue(teacherId, value) {
+    try {
+        const response = await fetch('http://192.168.15.82:5000/update_teacher_value', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ id: teacherId, value: value }),
+        });
+        
+        if (!response.ok) {
+            throw new Error('HTTP 错误! 状态码: ' + response.status);
+        }
+
+        const data = await response.json();
+        if (data.status) {
+            console.log("数据库更新成功");
+        } else {
+            alert(`更新失败: ${data.error}`);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+        
+        
+function changeColor(buttonId) {
+    const button3 = document.getElementById(buttonId);
+    const buttonValue = button3.value;
+
+    if (buttonValue == "1") {
+        button3.style.backgroundColor = "rgba(0, 0, 0, 0)";
+        button3.value = "0";
+        // 调用函数以更新数据库，值设置为 0
+        updateTeacherValue(buttonId, 0);
+    } else {
+        button3.style.backgroundColor = "rgba(148, 181, 219, 0.993)";
+        button3.value = "1";
+        // 调用函数以更新数据库，值设置为 1
+        updateTeacherValue(buttonId, 1);
+    }
+}
+
+    </script>
+</head>
+
+<body>
+    <h1 id="title" style="position: relative; left: 44%;">管理頁面</h1>
+    <button class="button3" id="teacher1"  value="1" style="left: 5%; top: 12%; background-color: rgba(148, 181, 219, 0.993); color: rgb(3, 3, 3); font-size: 25px; font-weight: bold" >林士勛 教師研究室</button>
+    <button class="button2" id="button1"   style="left:23%; top:  13%; background-color: rgba(148, 181, 219, 0.993); color: white; font-size: 16px;"onclick="changeColor('teacher1')"></button>
+
+    <button class="button3" id="teacher2" value="1" style="left: 5%; top: 20%; background-color: rgba(148, 181, 219, 0.993); color: rgb(3, 3, 3); font-size: 25px; font-weight: bold">鄭建富 教師研究室</button>
+    <button class="button2" id="button1" style="left:23%; top:  21%; background-color: rgba(148, 181, 219, 0.993); color: white; font-size: 16px;"onclick="changeColor('teacher2')"></button>
+
+    <button class="button3" id="teacher3" value="1" style="left: 5%; top: 28%; background-color: rgba(148, 181, 219, 0.993); color: rgb(3, 3, 3); font-size: 25px; font-weight: bold">馬尚彬 教師研究室</button>
+    <button class="button2" id="button1" style="left:23%; top:  29%; background-color: rgba(148, 181, 219, 0.993); color: white; font-size: 16px;"onclick="changeColor('teacher3')"></button>
+
+    <button class="button3" id="teacher4" value="1" style="left: 5%; top: 36%; background-color: rgba(148, 181, 219, 0.993); color: rgb(3, 3, 3); font-size: 25px; font-weight: bold">林致宇 教師研究室</button>
+    <button class="button2" id="button1" style="left:23%; top:  37%; background-color: rgba(148, 181, 219, 0.993); color: white; font-size: 16px;"onclick="changeColor('teacher4')"></button>
+
+    <button class="button3" id = "teacher5" value="1" style="left:5%; top:  44%; background-color: rgba(148, 181, 219, 0.993);color: rgb(3, 3, 3); font-size: 25px; font-weight: bold">辛華昀 教師研究室</button>
+    <button class="button2" id="button1" style="left:23%; top:  45%; background-color: rgba(148, 181, 219, 0.993); color: white; font-size: 16px;"onclick="changeColor('teacher5')"></button>
+
+    <button class="button3" id = "teacher6" value="1" style="left:5%; top:  52%; background-color: rgba(148, 181, 219, 0.993);color: rgb(3, 3, 3); font-size: 25px; font-weight: bold">陳世曄 教師研究室</button>
+    <button class="button2" id="button1" style="left:23%; top:  53%; background-color: rgba(148, 181, 219, 0.993); color: white; font-size: 16px;"onclick="changeColor('teacher6')"></button>
+
+    <button class="button3" id = "teacher7" value="1" style="left:5%; top:  60%; background-color: rgba(148, 181, 219, 0.993);color: rgb(3, 3, 3); font-size: 25px; font-weight: bold">蔡宗惠 教師研究室</button>
+    <button class="button2" id="button1" style="left:23%; top:  61%; background-color: rgba(148, 181, 219, 0.993); color: white; font-size: 16px;"onclick="changeColor('teacher7')"></button>
+
+    <button class="button3" id = "teacher8" value="1" style="left:5%; top:  68%; background-color: rgba(148, 181, 219, 0.993);color: rgb(3, 3, 3); font-size: 25px; font-weight: bold">周祥順 教師研究室</button>
+    <button class="button2" id="button1" style="left:23%; top:  69%; background-color: rgba(148, 181, 219, 0.993); color: white; font-size: 16px;"onclick="changeColor('teacher8')"></button>
+
+    <button class="button3" id = "teacher9" value="1" style="left:5%; top:  76%; background-color: rgba(148, 181, 219, 0.993);color: rgb(3, 3, 3); font-size: 25px; font-weight: bold">羅家堯 教師研究室</button>
+    <button class="button2" id="button1" style="left:23%; top:  77%; background-color: rgba(148, 181, 219, 0.993); color: white; font-size: 16px;"onclick="changeColor('teacher9')"></button>
+
+    <button class="button3" id = "teacher10" value="1" style="left:5%; top:  84%; background-color: rgba(148, 181, 219, 0.993);color: rgb(3, 3, 3); font-size: 25px; font-weight: bold">蔡宗儒 教師研究室</button>
+    <button class="button2" id="button1" style="left:23%; top:  85%; background-color: rgba(148, 181, 219, 0.993); color: white; font-size: 16px;"onclick="changeColor('teacher10')"></button>
+
+    <button class="button3" id = "teacher11" value="1" style="left:28%; top: 12%; background-color: rgba(148, 181, 219, 0.993);color: rgb(3, 3, 3); font-size: 25px; font-weight: bold">黃智賢 教師研究室</button>
+    <button class="button2" id="button1" style="left:46%; top:  13%; background-color: rgba(148, 181, 219, 0.993); color: white; font-size: 16px;"onclick="changeColor('teacher11')"></button>
+
+    <button class="button3" id = "teacher12" value="1" style="left:28%; top: 20%; background-color: rgba(148, 181, 219, 0.993);color: rgb(3, 3, 3); font-size: 25px; font-weight: bold">江海邦 教師研究室</button>
+    <button class="button2" id="button1" style="left:46%; top:  21%; background-color: rgba(148, 181, 219, 0.993); color: white; font-size: 16px;"onclick="changeColor('teacher12')"></button>
+
+    <button class="button3" id = "teacher13" value="1" style="left:28%; top: 28%; background-color: rgba(148, 181, 219, 0.993);color: rgb(3, 3, 3); font-size: 25px; font-weight: bold">陳政營 教師研究室</button>
+    <button class="button2" id="button1" style="left:46%; top:  29%; background-color: rgba(148, 181, 219, 0.993); color: white; font-size: 16px;"onclick="changeColor('teacher13')"></button>
+
+    <button class="button3" id = "teacher14" value="1" style="left:28%; top: 36%; background-color: rgba(148, 181, 219, 0.993);color: rgb(3, 3, 3); font-size: 25px; font-weight: bold">吳允中 教師研究室</button>
+    <button class="button2" id="button1" style="left:46%; top:  37%; background-color: rgba(148, 181, 219, 0.993); color: white; font-size: 16px;"onclick="changeColor('teacher14')"></button>
+
+    <button class="button3" id = "teacher15" value="1" style="left:28%; top:44%; background-color: rgba(148, 181, 219, 0.993);color: rgb(3, 3, 3); font-size: 25px; font-weight: bold">林泰源 教師研究室</button>
+    <button class="button2" id="button1" style="left:46%; top:  45%; background-color: rgba(148, 181, 219, 0.993); color: white; font-size: 16px;"onclick="changeColor('teacher15')"></button>
+
+    <button class="button3" id = "teacher16" value="1" style="left:28%; top: 52%; background-color: rgba(148, 181, 219, 0.993);color: rgb(3, 3, 3); font-size: 25px; font-weight: bold;">洪文誼 教師研究室</button>
+    <button class="button2" id="button1" style="left:46%; top:  53%; background-color: rgba(148, 181, 219, 0.993); color: white; font-size: 16px;"onclick="changeColor('teacher16')"></button>
+
+    <button class="button3" id = "teacher17"value="1" style="left:28%; top:  60%; background-color: rgba(148, 181, 219, 0.993);color: rgb(3, 3, 3); font-size: 25px; font-weight: bold">程華淮 教師研究室</button>
+    <button class="button2" id="button1" style="left:46%; top:  61%; background-color: rgba(148, 181, 219, 0.993); color: white; font-size: 16px;"onclick="changeColor('teacher17')"></button>
+
+    <button class="button3" id = "teacher18" value="1" style="left:28%; top:  68%; background-color: rgba(148, 181, 219, 0.993);color: rgb(3, 3, 3); font-size: 25px; font-weight: bold">張欽圳 教師研究室</button>
+    <button class="button2" id="button1" style="left:46%; top:  69%; background-color: rgba(148, 181, 219, 0.993); color: white; font-size: 16px;"onclick="changeColor('teacher18')"></button>
+
+    <button class="button3" id = "teacher19" value="1" style="left:28%; top:  76%; background-color: rgba(148, 181, 219, 0.993);color: rgb(3, 3, 3); font-size: 25px; font-weight: bold">葉春超 教師研究室</button>
+    <button class="button2" id="button1" style="left:46%; top:  77%; background-color: rgba(148, 181, 219, 0.993); color: white; font-size: 16px;"onclick="changeColor('teacher19')"></button>
+
+    <button class="button3" id = "teacher20" value="1" style="left:28%; top:84%; background-color: rgba(148, 181, 219, 0.993);color: rgb(3, 3, 3); font-size: 25px; font-weight: bold">蔡東佐 教師研究室</button>
+    <button class="button2" id="button1" style="left:46%; top:  85%; background-color: rgba(148, 181, 219, 0.993); color: white; font-size: 16px;"onclick="changeColor('teacher20')"></button>
+
+    <button class="button3" id = "teacher21" value="1" style="left:51%; top:12%; background-color: rgba(148, 181, 219, 0.993);color: rgb(3, 3, 3); font-size: 25px; font-weight: bold">蔡宇軒 教師研究室</button>
+    <button class="button2" id="button1" style="left:69%; top:  13%; background-color: rgba(148, 181, 219, 0.993); color: white; font-size: 16px;"onclick="changeColor('teacher21')"></button>
+
+    <button class="button3" id = "teacher22" value="1" style="left:51%; top:20%; background-color: rgba(148, 181, 219, 0.993);color: rgb(3, 3, 3); font-size: 25px; font-weight: bold">翁世光 教師研究室</button>
+    <button class="button2" id="button1" style="left:69%; top:  21%; background-color: rgba(148, 181, 219, 0.993); color: white; font-size: 16px;"onclick="changeColor('teacher22')"></button>
+
+    <button class="button3" id = "teacher23" value="1" style="left:51%; top:28%; background-color: rgba(148, 181, 219, 0.993);color: rgb(3, 3, 3); font-size: 25px; font-weight: bold">李孟書 教師研究室</button>
+    <button class="button2" id="button1" style="left:69%; top:  29%; background-color: rgba(148, 181, 219, 0.993); color: white; font-size: 16px;"onclick="changeColor('teacher23')"></button>
+
+    <button class="button3" id = "teacher24" value="1" style="left:51%; top:36%; background-color: rgba(148, 181, 219, 0.993);color: rgb(3, 3, 3); font-size: 25px; font-weight: bold">丁培毅 教師研究室</button>
+    <button class="button2" id="button1" style="left:69%; top:  37%; background-color: rgba(148, 181, 219, 0.993); color: white; font-size: 16px;"onclick="changeColor('teacher24')"></button>
+
+    <button class="button3" id = "teacher25" value="1" style="left:51%; top:44%; background-color: rgba(148, 181, 219, 0.993);color: rgb(3, 3, 3); font-size: 25px; font-weight: bold">張光遠 教師研究室</button>
+    <button class="button2" id="button1" style="left:69%; top:  45%; background-color: rgba(148, 181, 219, 0.993); color: white; font-size: 16px;"onclick="changeColor('teacher25')"></button>
+
+    <button class="button3" id = "teacher26" value="1" style="left:51%; top:52%; background-color: rgba(148, 181, 219, 0.993);color: rgb(3, 3, 3); font-size: 25px; font-weight: bold">許玉平 教師研究室</button>
+    <button class="button2" id="button1" style="left:69%; top:  53%; background-color: rgba(148, 181, 219, 0.993); color: white; font-size: 16px;"onclick="changeColor('teacher26')"></button>
+
+    <button class="button3" id = "teacher27" value="1" style="left:51%; top: 60%; background-color: rgba(148, 181, 219, 0.993);color: rgb(3, 3, 3); font-size: 25px; font-weight: bold">馬永昌 教師研究室</button>
+    <button class="button2" id="button1" style="left:69%; top:  61%; background-color: rgba(148, 181, 219, 0.993); color: white; font-size: 16px;"onclick="changeColor('teacher27')"></button>
+
+    <button class="button3" id = "teacher28" value="1" style="left:51%; top:  68%; background-color: rgba(148, 181, 219, 0.993);color: rgb(3, 3, 3); font-size: 25px; font-weight: bold">阮義聰 教師研究室</button>
+    <button class="button2" id="button1" style="left:69%; top:  69%; background-color: rgba(148, 181, 219, 0.993); color: white; font-size: 16px;"onclick="changeColor('teacher28')"></button>
+
+    <button class="button3" id = "teacher29" value="1" style="left:51%; top:  76%; background-color: rgba(148, 181, 219, 0.993);color: rgb(3, 3, 3); font-size: 25px; font-weight: bold">林川傑 教師研究室</button>
+    <button class="button2" id="button1" style="left:69%; top:  77%; background-color: rgba(148, 181, 219, 0.993); color: white; font-size: 16px;"onclick="changeColor('teacher29')"></button>
+
+    <button class="button3" id = "teacher30" value="1" style="left:51%; top:  84%; background-color: rgba(148, 181, 219, 0.993);color: rgb(3, 3, 3); font-size: 25px; font-weight: bold">鄭錫齊 教師研究室</button>
+    <button class="button2" id="button1" style="left:69%; top:  85%; background-color: rgba(148, 181, 219, 0.993); color: white; font-size: 16px;"onclick="changeColor('teacher30')"></button>
+
+    <button class="button3" id = "teacher31" value="1" style="left:74%; top:  12%; background-color: rgba(148, 181, 219, 0.993);color: rgb(3, 3, 3); font-size: 25px; font-weight: bold">林韓禹 教師研究室</button>
+    <button class="button2" id="button1" style="left:92%; top:  13%; background-color: rgba(148, 181, 219, 0.993); color: white; font-size: 16px;"onclick="changeColor('teacher31')"></button>
+
+    <button class="button3" id = "teacher32" value="1" style="left:74%; top:  20%; background-color: rgba(148, 181, 219, 0.993);color: rgb(3, 3, 3); font-size: 25px; font-weight: bold">林清池 教師研究室</button>
+    <button class="button2" id="button1" style="left:92%; top:  21%; background-color: rgba(148, 181, 219, 0.993); color: white; font-size: 16px;"onclick="changeColor('teacher32')"></button>
+
+    <button class="button3" id = "teacher33" value="1" style="left:74%; top:  28%; background-color: rgba(148, 181, 219, 0.993);color: rgb(3, 3, 3); font-size: 25px; font-weight: bold">趙志民 教師研究室</button>
+    <button class="button2" id="button1" style="left:92%; top:  29%; background-color: rgba(148, 181, 219, 0.993); color: white; font-size: 16px;"onclick="changeColor('teacher33')"></button>
+
+    <button class="button3" id = "teacher34" value="1" style="left:74%; top:  36%; background-color: rgba(148, 181, 219, 0.993);color: rgb(3, 3, 3); font-size: 25px; font-weight: bold;">張雅惠 教師研究室</button>
+    <button class="button2" id="button1" style="left:92%; top:  37%; background-color: rgba(148, 181, 219, 0.993); color: white; font-size: 16px;"onclick="changeColor('teacher34')"></button>
+
+    <button class="button3" id = "teacher35" value="1" style="left:74%; top:  44%; background-color: rgba(148, 181, 219, 0.993);color: rgb(3, 3, 3); font-size: 25px; font-weight: bold;">嚴茂旭 教師研究室</button>
+    <button class="button2" id="button1" style="left:92%; top:  45%; background-color: rgba(148, 181, 219, 0.993); color: white; font-size: 16px;"onclick="changeColor('teacher35')"></button>
+
+    <button class="button3" id = "teacher36" value="1" style="left:74%; top:  52%; background-color: rgba(148, 181, 219, 0.993);color: rgb(3, 3, 3); font-size: 25px; font-weight: bold;">許為元 教師研究室</button>
+    <button class="button2" id="button1" style="left:92%; top:  53%; background-color: rgba(148, 181, 219, 0.993); color: white; font-size: 16px;"onclick="changeColor('teacher36')"></button>
+
+    <button class="button3" style="left:74%; top:  68%; background-color:rgba(148, 181, 219, 0.993); font-size: 25px; font-weight: bold;">代表顯示</button>
+    <button class="button2" style="left:74%; top:  80%; background-color: rgba(148, 181, 219, 0.993); color: white; font-size: 16px;"></button>
+    <button class="button3" style="left:78%; top:  79%; background-color: transparent ;font-size: 25px; font-weight: bold;">按下更改狀態</button>
+    <button class = "button2" style="right: 5%; top: 89%; background-color: rgba(37, 143, 243, 0.492); border-radius: 50px; font-weight: bold;"  onclick="location.href='home.html'">電综大樓首頁</button>
+
+
+</body>
+</html>

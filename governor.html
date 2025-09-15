@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <style>
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #629de0, #1e7fec);
+        }
+
+        
+        .login-container {
+            background-color: #fff;
+            padding: 2rem;
+            width: 100%;
+            max-width: 400px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        
+        h2 {
+            color: #333;
+            margin-bottom: 1.5rem;
+        }
+
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #555;
+            text-align: left;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 0.8rem;
+            margin-bottom: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        
+        button {
+            width: 100%;
+            padding: 0.8rem;
+            font-size: 1rem;
+            color: #fff;
+            background-color: #4a90e2;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #357abd;
+        }
+
+        
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+    </style>
+    <script>
+        function validateLogin() {
+            const predefinedUsername = "1";
+            const predefinedPassword = "1";
+
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+
+            if (username === predefinedUsername && password === predefinedPassword) {
+                window.location.href = "teacher.html";
+            } else {
+                alert("Invalid username or password.");
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="login-container">
+        <h2>Login</h2>
+        <form onsubmit="event.preventDefault(); validateLogin();">
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit">Login</button>
+        </form>
+    </div>
+</body>
+</html>
